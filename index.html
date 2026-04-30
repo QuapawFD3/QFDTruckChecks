@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QFD | Apparatus Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     EmailJS — https://www.emailjs.com
+     1. Create free account at emailjs.com
+     2. Add Email Service → SMTP → smtp.hostinger.com, port 465
+     3. Create an Email Template with ONE variable: {{{report}}}
+     4. Replace the three placeholder values below with your IDs
+     ════════════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // ← replace
+  const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // ← replace
+  const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // ← replace
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+</script>
+
+<style>
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface2:#1f2937;--border:#30363d;
+  --red:#dc2626;--red-glow:rgba(220,38,38,0.12);
+  --amber:#f59e0b;--green:#16a34a;
+  --text:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
+  --pass-bg:rgba(22,163,74,0.12);--fail-bg:rgba(220,38,38,0.12);
+  --radius:6px;--shadow:0 4px 24px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;font-size:15px;line-height:1.5;}
+.app-header{background:var(--surface);border-bottom:3px solid var(--red);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.6);}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-badge{width:40px;height:40px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;flex-shrink:0;}
+.logo-dept{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;letter-spacing:.5px;line-height:1.1;}
+.logo-sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
+.nav-tabs{display:flex;gap:4px;}
+.nav-tab{padding:8px 16px;border:none;background:none;color:var(--text-muted);font-family:'Barlow',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border-radius:var(--radius);transition:all .2s;}
+.nav-tab:hover{color:var(--text);background:var(--surface2);}
+.nav-tab.active{color:var(--red);background:var(--red-glow);}
+.app-main{max-width:900px;margin:0 auto;padding:32px 24px;}
+.view{display:none;}.view.active{display:block;}
+.step-indicator{display:flex;align-items:center;margin-bottom:32px;}
+.step{display:flex;align-items:center;flex:1;}
+.step-num{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;background:var(--surface);color:var(--text-muted);flex-shrink:0;transition:all .3s;}
+.step-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-left:8px;transition:color .3s;white-space:nowrap;}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 12px;transition:background .3s;}
+.step.done .step-num{background:var(--green);border-color:var(--green);color:#fff;}
+.step.active .step-num{background:var(--red);border-color:var(--red);color:#fff;}
+.step.active .step-label,.step.done .step-label{color:var(--text);}
+.step.done .step-label{color:#4ade80;}
+.step.done+.step-line{background:var(--green);}
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+.section-header{padding:13px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+
+.section-title{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;}
+.section-progress{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);margin-right:10px;}
+.collapse-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:0;transition:transform .2s;line-height:1;}
+.collapse-btn.collapsed{transform:rotate(-90deg);}
+.section-body.collapsed{display:none;}
+.checklist-item{border-bottom:1px solid var(--border);transition:background .15s;}
+.checklist-item:last-child{border-bottom:none;}
+.item-row{display:flex;align-items:center;padding:11px 20px;gap:16px;}
+.item-text{flex:1;font-size:14px;}
+.status-buttons{display:flex;gap:4px;flex-shrink:0;}
+.status-btn{width:52px;height:30px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.5px;}
+.status-btn:hover{border-color:var(--text-muted);color:var(--text-muted);}
+.status-btn.pass.active{background:var(--pass-bg);border-color:var(--green);color:#4ade80;}
+.status-btn.fail.active{background:var(--fail-bg);border-color:var(--red);color:#f87171;}
+.status-btn.na.active{background:rgba(139,148,158,.1);border-color:var(--text-muted);color:var(--text-muted);}
+.checklist-item.failed{background:rgba(220,38,38,.05);}
+.checklist-item.passed{background:rgba(22,163,74,.03);}
+.item-deficiency{padding:0 20px 12px 52px;display:none;}
+.item-deficiency.visible{display:block;}
+.deficiency-note{width:100%;background:var(--bg);border:1px solid rgba(220,38,38,.4);border-radius:4px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;padding:8px 12px;resize:vertical;min-height:58px;margin-bottom:8px;}
+.deficiency-note::placeholder{color:var(--text-dim);}
+.photo-upload-area{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.photo-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text-muted);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.photo-btn:hover{border-color:var(--amber);color:var(--amber);}
+.photo-thumb{width:44px;height:44px;border-radius:4px;object-fit:cover;border:1px solid var(--border);cursor:pointer;}
+.section-status-dot{width:8px;height:8px;border-radius:50%;background:var(--border);display:inline-block;margin-right:10px;flex-shrink:0;transition:background .2s;}
+.section-status-dot.complete{background:var(--green);}
+.section-status-dot.has-fails{background:var(--red);}
+.section-status-dot.partial{background:var(--amber);}
+.unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:8px;}
+.unit-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:18px 16px;cursor:pointer;transition:all .2s;text-align:center;}
+.unit-card:hover{border-color:var(--red);background:var(--red-glow);transform:translateY(-2px);}
+.unit-card.selected{border-color:var(--red);background:var(--red-glow);}
+.unit-icon{font-size:28px;margin-bottom:8px;display:block;}
+.unit-name{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.unit-type{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.form-group{margin-bottom:18px;}
+.form-label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:5px;}
+.form-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:10px 14px;transition:border-color .15s;-webkit-appearance:none;}
+.form-input:focus{outline:none;border-color:var(--red);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.required-mark{color:var(--red);}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border:none;border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-primary{background:var(--red);color:#fff;}
+.btn-primary:hover{background:#b91c1c;}
+.btn-primary:disabled{background:var(--surface2);color:var(--text-muted);cursor:not-allowed;}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--text-muted);}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover{background:#15803d;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:24px;border-top:1px solid var(--border);}
+.progress-bar-wrap{background:var(--surface2);border-radius:4px;height:5px;margin-bottom:22px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:var(--red);border-radius:4px;transition:width .4s ease;}
+.summary-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
+.stat-value{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;line-height:1;margin-bottom:3px;}
+.stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);}
+.stat-card.pass .stat-value{color:#4ade80;}
+.stat-card.fail .stat-value{color:#f87171;}
+.stat-card.na .stat-value{color:var(--text-muted);}
+.status-banner{padding:13px 18px;border-radius:var(--radius);margin-bottom:20px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:10px;}
+.status-banner.all-clear{background:rgba(22,163,74,.15);border:1px solid #16a34a;color:#4ade80;}
+.status-banner.has-deficiencies{background:var(--fail-bg);border:1px solid var(--red);color:#f87171;}
+.deficiency-entry{background:var(--fail-bg);border:1px solid rgba(220,38,38,.25);border-radius:var(--radius);padding:11px 15px;margin-bottom:8px;}
+.deficiency-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#f87171;margin-bottom:2px;}
+.deficiency-item-name{font-size:14px;color:var(--text);}
+.deficiency-item-note{font-size:12px;color:var(--text-muted);margin-top:3px;font-style:italic;}
+.history-table{width:100%;border-collapse:collapse;}
+.history-table th{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);padding:11px 16px;text-align:left;border-bottom:2px solid var(--border);}
+.history-table td{padding:11px 16px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+.history-table tr:hover td{background:var(--surface2);}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;}
+.badge-pass{background:rgba(22,163,74,.2);color:#4ade80;}
+.badge-fail{background:rgba(220,38,38,.2);color:#f87171;}
+.link-btn{background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;padding:0;font-family:'Barlow',sans-serif;text-decoration:underline;}
+.link-btn:hover{color:#f87171;}
+.danger-btn{background:none;border:1px solid rgba(220,38,38,.35);color:#f87171;font-size:12px;padding:6px 12px;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:500;transition:all .2s;}
+.danger-btn:hover{background:var(--fail-bg);}
+.page-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.page-subtitle{font-size:14px;color:var(--text-muted);margin-bottom:26px;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 18px;font-size:14px;font-weight:500;z-index:1000;box-shadow:var(--shadow);display:none;max-width:340px;}
+.toast.success{border-color:var(--green);color:#4ade80;}
+.toast.error{border-color:var(--red);color:#f87171;}
+.toast.visible{display:block;animation:toastIn .3s ease;}
+@keyframes toastIn{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:200;}
+.loading-overlay.visible{display:flex;}
+.loader{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px 48px;text-align:center;}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:center;justify-content:center;padding:24px;display:none;}
+.modal-overlay.visible{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:620px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow);}
+.modal-header{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);}
+.modal-title{font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;text-transform:uppercase;}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:4px;line-height:1;}
+.modal-body{padding:22px;}
+.empty-state{text-align:center;padding:64px 32px;color:var(--text-muted);}
+.config-warn{background:rgba(245,158,11,.1);border:1px solid var(--amber);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--amber);margin-bottom:20px;}
+@media(max-width:640px){
+  .app-header{padding:0 14px;}.app-main{padding:18px 14px;}
+  .form-grid{grid-template-columns:1fr;}.summary-stats{grid-template-columns:repeat(2,1fr);}
+  .unit-grid{grid-template-columns:repeat(2,1fr);}.step-label{display:none;}
+  .logo-sub{display:none;}.item-row{padding:10px 14px;gap:10px;}
+  .item-deficiency{padding:0 14px 12px 14px;}.status-btn{width:44px;font-size:10px;}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loader">
+    <div class="spinner"></div>
+    <div style="font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:2px;text-transform:uppercase;">Submitting Report</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Sending to TruckChecks@quapawfire.com...</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Check Details</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<header class="app-header">
+  <div class="logo">
+    <div class="logo-badge">QFD</div>
+    <div>
+      <div class="logo-dept">Quapaw Fire Dept.</div>
+      <div class="logo-sub">Apparatus Check System</div>
+    </div>
+  </div>
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchView('check',this)">▶ New Check</button>
+    <button class="nav-tab" onclick="switchView('history',this)">📋 History</button>
+  </nav>
+</header>
+
+<main class="app-main">
+  <div class="view active" id="view-check">
+    <div class="step-indicator" id="stepIndicator">
+      <div class="step" id="stepEl-1"><div class="step-num">1</div><div class="step-label">Unit</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="stepEl-2"><div class="step-num">2</div><div class="step-label">Details</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="stepEl-3"><div class="step-num">3</div><div class="step-label">Checklist</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="stepEl-4"><div class="step-num">4</div><div class="step-label">Review</div></div>
+    </div>
+    <div id="step-content"></div>
+  </div>
+  <div class="view" id="view-history">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div>
+        <div class="page-title">Check History</div>
+        <div class="page-subtitle" style="margin:0;">Stored locally on this device</div>
+      </div>
+      <button class="danger-btn" onclick="clearHistory()">Clear All History</button>
+    </div>
+    <div id="historyContent"></div>
+  </div>
+</main>
+
+<script>
+// ════════════════════════════════════════════════════
+// UNITS
+// ════════════════════════════════════════════════════
+const UNITS = [
+  {id:'brush1',   name:'Brush 1',       type:'brush',     icon:'🌲'},
+  {id:'brush18',  name:'Brush 18',      type:'brush',     icon:'🌲'},
+  {id:'brush20',  name:'Brush 20',      type:'brush',     icon:'🌲'},
+  {id:'brush27',  name:'Brush 27',      type:'brush',     icon:'🌲'},
+  {id:'brush28',  name:'Brush 28',      type:'brush',     icon:'🌲'},
+  {id:'eng21',    name:'Engine 21',     type:'engine',    icon:'🚒'},
+  {id:'eng22',    name:'Engine 22',     type:'engine',    icon:'🚒'},
+  {id:'res23',    name:'Rescue 23',     type:'rescue',    icon:'🔧'},
+  {id:'medres',   name:'Medium Rescue', type:'medrescue', icon:'💨'},
+  {id:'tank2',    name:'Tanker 2',      type:'tanker',    icon:'🚛'},
+  {id:'tank25',   name:'Tanker 25',     type:'tanker',    icon:'🚛'},
+];
+
+// ════════════════════════════════════════════════════
+// CHECKLISTS
+// ════════════════════════════════════════════════════
+const CHECKLISTS = {
+  engine:[
+    {title:'Cab & Driver Area',items:['Fuel level — 3/4 tank minimum','Engine oil — within normal range','Coolant level — within normal range','Transmission fluid — within normal range','Power steering fluid — within normal range','Brake fluid — within normal range','Air brake pressure builds to operating range','Parking brake functional','Windshield clean and unobstructed','Windshield wipers and washers operational','Horn functional','Seatbelts present and functional — all positions','No dashboard warning or fault lights active','Mirrors properly adjusted','Radio on correct channel and operational','MDT / CAD terminal operational (if equipped)']},
+    {title:'Exterior & Lighting',items:['Headlights — low beam operational','Headlights — high beam operational','Taillights operational','Brake lights operational','Turn signals — all four corners operational','Emergency warning lights — all zones operational','Scene / work lights operational','Step / ground lights operational','Reverse lights and backup alarm functional','All tires properly inflated and free of damage','No visible fluid leaks under apparatus','All compartment doors close and latch securely','Handrails and steps secure and undamaged','Chassis and body free of significant damage','Ground ladders properly mounted and secured']},
+    {title:'Engine Compartment',items:['No evidence of fluid leaks in compartment','Drive belts in good condition — no cracking or fraying','All hoses in good condition — no bulging or leaks','Air filter restriction indicator in green zone','Engine starts and runs smoothly','No unusual noises at idle','Battery terminals secure and free of corrosion','Alternator / charging system operational']},
+    {title:'Pump & Water System',items:['Booster tank full (at required operating level)','Pump primer oil level adequate','Tank-to-pump valve opens and closes properly','All discharge valves operational and capped','All intake valves operational and capped','Steamer / LDH intake cap secure','Pump panel gauges functional and zeroed','Pump panel lights operational','Pump shift engages and disengages properly','Relief / governor valve operational','All drain valves operational','Booster reel charged and hose in good condition (if equipped)','Foam tank level adequate (if equipped)','Foam proportioner system operational (if equipped)']},
+    {title:'Hose Load & Nozzles',items:['Pre-connect attack lines — loaded correctly and secured','Supply hose — correct quantity loaded and in good condition','Attack hose — correct quantity and in good condition','All nozzles present, accounted for, and functional','Nozzle gaskets in good condition','Hose appliances present — wye, siamese, reducers','Hose straps and bands secure','Smooth-bore tips present and accounted for (if equipped)']},
+    {title:'Ground Ladders',items:['Extension ladder present and free of damage','Roof ladder present and free of damage','Attic / folding ladder present and secure (if equipped)','All ladder mounts and restraints secure','Ladder rungs free of bends, cracks, or corrosion','Halyard rope in good condition — no fraying','Roof hooks functional and secure']},
+    {title:'SCBA & Breathing Equipment',items:['All SCBA units present and accounted for','All SCBA cylinders at full pressure (4500 PSI or rated capacity)','SCBA harnesses and straps in good condition','SCBA face pieces — lenses clear, seals undamaged','PASS devices functional and armed','Spare SCBA cylinders — correct quantity present','All cylinders within hydrostatic test date']},
+    {title:'Hand Tools & Equipment',items:['Irons (halligan & flat-head axe) present and secured','Pickhead axe present and secured','Pike poles / hooks present','Salvage covers present and in good condition','Portable handlights — charged and operational','Scene / tripod lights present and operational','Thermal imaging camera (TIC) charged and operational','EMS / first aid kit complete and in-date']},
+    {title:'PPE & Safety Equipment',items:['Structural PPE (turnout gear) — all sets present and serviceable','Helmets present and undamaged','Gloves — adequate supply','Traffic / safety vests present','Wheel chocks present (minimum 2)','Road flares / traffic cones present']}
+  ],
+  tanker:[
+    {title:'Cab & Driver Area',items:['Fuel level — 3/4 tank minimum','Engine oil — within normal range','Coolant level — within normal range','Transmission fluid — within normal range','Air brake pressure builds to operating range','Parking brake functional','Windshield clean and unobstructed','Windshield wipers and washers operational','Horn functional','Seatbelts present and functional — all positions','No dashboard warning or fault lights active','Mirrors properly adjusted','Radio on correct channel and operational']},
+    {title:'Exterior & Lighting',items:['Headlights — low and high beam operational','Taillights and brake lights operational','Turn signals — all four corners operational','Emergency warning lights — all zones operational','Scene / work lights operational','Reverse lights and backup alarm functional','All tires properly inflated and free of damage','No visible fluid leaks under apparatus','All compartment doors close and latch securely','Handrails and steps secure','Chassis and body free of significant damage','Tank vents unobstructed and functional']},
+    {title:'Engine Compartment',items:['No evidence of fluid leaks in compartment','All drive belts and hoses in good condition','Engine starts and runs smoothly','No unusual noises at idle','Battery terminals secure and free of corrosion','Alternator / charging system operational']},
+    {title:'Tank & Fill System',items:['Main tank full (rated capacity)','Tank structural integrity — no visible cracks or leaks','Tank-to-fill valve functional','Top fill valve opens and closes properly','Direct tank fill connection capped and secure','Tank vent pipe clear and unobstructed','Overflow pipe clear and unobstructed','Tank sight gauge / level indicator functional','Quick-fill / nurse tender system operational (if equipped)','Hard suction hose present and in good condition']},
+    {title:'Dump Valves & Portable Equipment',items:['Main dump valve(s) open and close properly','Dump chute deploys and stows properly','Rear dump valve capped and secure','Side dump valve(s) capped and secure (if equipped)','Portable folding tank(s) present and in good condition','Portable tank carry straps / tote present','Low-head dump suction strainer present','Porta-pond / jet siphon present (if equipped)']},
+    {title:'Pump & Discharge System',items:['Transfer / auxiliary pump operational (if equipped)','Pump discharge valves operational and capped','Pump panel gauges functional','Pump engages and disengages properly','Hose — correct quantity and in good condition','Nozzles / appliances present and functional']},
+    {title:'PPE & Safety Equipment',items:['Structural PPE — all sets present and serviceable','Traffic / safety vests present','Wheel chocks present (minimum 2)','Road flares / traffic cones present','EMS / first aid kit present']}
+  ],
+  brush:[
+    {title:'Cab & Driver Area',items:['Fuel level — 3/4 tank minimum','Engine oil — within normal range','Coolant level — within normal range','Transmission fluid — within normal range','4WD system operational and all modes engage','Parking brake functional','Windshield clean and unobstructed','Windshield wipers operational','Horn functional','Seatbelts present and functional — all positions','No dashboard warning or fault lights active','Mirrors properly adjusted','Radio on correct channel and operational']},
+    {title:'Exterior & Lighting',items:['Headlights — low and high beam operational','Taillights and brake lights operational','Turn signals — all four corners operational','Emergency warning lights operational','Scene / work lights operational','Reverse lights and backup alarm functional','All tires — properly inflated, adequate tread, no damage','No visible fluid leaks under apparatus','Underbody skid plates / brush guards secure (if equipped)','All compartment doors latch securely']},
+    {title:'Engine & Drivetrain',items:['Engine starts and runs smoothly','No unusual noises at idle or under load','All belts and hoses in good condition','Battery terminals secure and free of corrosion','Exhaust system secure and free of leaks','Locking differentials operational (if equipped)','PTO operational (if equipped)','Winch operational and cable in good condition (if equipped)']},
+    {title:'Water System',items:['Booster tank full','Pump prime functional','Pump engages and disengages properly','All discharge valves operational and capped','Booster reel charged and hose in good condition','Nozzle(s) present and functional','All drain valves operational','Foam system operational (if equipped)']},
+    {title:'Wildland Hand Tools',items:['Pulaski(s) present and secured','McLeod(s) / Council rake(s) present and secured','Shovel(s) present and secured','Hand saw(s) present and secured','Chainsaw present, fueled and operational (if equipped)','Drip torch present and fueled (if equipped)','Bladder bag(s) present and operational','Flagging tape and marking materials present','Backpack pump(s) present (if equipped)']},
+    {title:'Communications & Navigation',items:['Portable radios — charged and on correct channel','Radio charger / spare battery present','Map / compass / GPS device present','Area road map current and present']},
+    {title:'PPE & Safety Equipment',items:['Wildland PPE (Nomex shirt and pants) — all sets present and serviceable','Wildland helmets present','Fire shelters — one per person, properly packed, in-date','Leather gloves — adequate supply','Eye protection present','EMS / first aid kit complete and in-date','Traffic / safety vests present','Wheel chocks present']}
+  ],
+  rescue:[
+    {title:'Cab & Driver Area',items:['Fuel level — 3/4 tank minimum','Engine oil — within normal range','Coolant level — within normal range','Transmission fluid — within normal range','Parking brake functional','Windshield clean and unobstructed','Windshield wipers operational','Horn functional','Seatbelts present and functional — all positions','No dashboard warning or fault lights active','Mirrors properly adjusted','Radio on correct channel and operational','MDT / CAD terminal operational (if equipped)']},
+    {title:'Exterior & Lighting',items:['Headlights — low and high beam operational','Taillights and brake lights operational','Turn signals — all four corners operational','Emergency warning lights — all zones operational','Scene / work lights — all sides operational','Floodlights / telescoping lights operational (if equipped)','Reverse lights and backup alarm functional','All tires properly inflated and free of damage','No visible fluid leaks','All compartment doors close and latch securely','Handrails and steps secure']},
+    {title:'Generator & Electrical',items:['Generator starts and runs properly','Generator fuel level adequate','Generator output voltage within spec','Generator circuit breakers functional','All outlet receptacles functional and weatherproofed','Power cables — 100 ft minimum, in good condition','Junction / distribution box functional']},
+    {title:'Rescue & Extrication Equipment',items:['Hydraulic spreader — fluid level adequate and operational','Hydraulic cutters operational','Hydraulic ram(s) operational','High-lift jack present and functional','Rescue straps / chains present and in good condition','Cribbing — adequate supply and in good condition','Come-along / manual winch present','Reciprocating saw with rescue blades operational','Lifting air bags — all present and functional (if equipped)','Stabilization struts present and functional (if equipped)']},
+    {title:'Medical Equipment',items:['AED — fully charged, pads in-date','Oxygen — cylinder pressure adequate, regulator functional','Stretcher / backboards present and in good condition','Cervical collars — full range of sizes present','Trauma bags — stocked and in-date','Airway management kit complete','Bleeding control kits (tourniquets, packing gauze) present','Cold weather / hypothermia blankets present']},
+    {title:'Hand & Power Tools',items:['Reciprocating saw operational and blades stocked','Circular saw operational — masonry and metal blades present','Chain saw present, fueled and operational (if equipped)','Drill / driver operational and batteries charged','Pry bars — full set present','Bolt cutters present']},
+    {title:'Lighting & Scene Equipment',items:['Portable LED handlights — all charged and operational','Scene tripod lights operational','Power extension cords present','Traffic cones / road flares — adequate supply','Traffic / safety vests present','Wheel chocks present (minimum 2)']}
+  ],
+  medrescue:[
+    {title:'Cab & Driver Area',items:['Fuel level — 3/4 tank minimum','Engine oil — within normal range','Coolant level — within normal range','Transmission fluid — within normal range','Parking brake functional','Windshield clean and unobstructed','Windshield wipers operational','Horn functional','Seatbelts present and functional — all positions','No dashboard warning or fault lights active','Mirrors properly adjusted','Radio on correct channel and operational','MDT / CAD terminal operational (if equipped)']},
+    {title:'Exterior & Lighting',items:['Headlights — low and high beam operational','Taillights and brake lights operational','Turn signals — all four corners operational','Emergency warning lights — all zones operational','Scene / work lights — all sides operational','Reverse lights and backup alarm functional','All tires properly inflated and free of damage','No visible fluid leaks','All compartment doors close and latch securely','Handrails and steps secure']},
+    {title:'Generator & Electrical',items:['Generator starts and runs properly','Generator fuel level adequate','Generator output voltage within spec','All outlet receptacles functional','Power cables — 100 ft minimum, in good condition']},
+    {title:'Rescue & Extrication Equipment',items:['Hydraulic spreader operational','Hydraulic cutters operational','Hydraulic ram(s) operational','High-lift jack present and functional','Rescue straps / chains present and in good condition','Cribbing — adequate supply and in good condition','Come-along / manual winch present','Reciprocating saw with rescue blades operational']},
+    {title:'Medical Equipment',items:['AED — fully charged, pads in-date','Oxygen — cylinder pressure adequate, regulator functional','Stretcher / backboards present and in good condition','Cervical collars — full range of sizes present','Trauma bags — stocked and in-date','Airway management kit complete','Bleeding control kits (tourniquets, packing gauze) present']},
+    {title:'SCBA Cascade / Refill Station',items:['Cascade cylinders — all charged to operating pressure','Cascade manifold — no leaks detected','Cylinder isolation valves open and close properly','Fill panel gauges accurate and functional','Fill whips in good condition — no cracking or damage','Cylinder mounts / rack secure — no movement','All cascade cylinders within hydrostatic test date','Carbon monoxide monitor / alarm operational and in-date','Spare SCBA cylinders — correct quantity present and fully charged','All spare cylinders within hydrostatic test date','Cylinder inventory log current and signed','Low-pressure / depleted cylinders segregated for refill','Spare valve O-rings available']},
+    {title:'SCBA Units & Masks',items:['All SCBA units present and accounted for','SCBA harnesses and frames — no visible damage','Face pieces — lenses clear, seals undamaged','Face piece straps in good condition — no cracking','PASS devices functional and armed','All units within required flow-test period']},
+    {title:'Hand Tools & Lighting',items:['Pry bars — full set present','Bolt cutters present','Drill / driver operational and batteries charged','Portable LED handlights — all charged and operational','Scene tripod lights operational','Power extension cords present','Traffic cones / road flares — adequate supply','Traffic / safety vests present','Wheel chocks present (minimum 2)']}
+  ]
+};
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let S = {step:1, unitId:null, info:{date:'',time:'',performer:'',mileage:'',notes:''}, items:{}};
+const getUnit = () => UNITS.find(u => u.id === S.unitId);
+const getCL   = () => { const u = getUnit(); return u ? CHECKLISTS[u.type] : []; };
+
+const TYPE_LABEL = {engine:'Engine / Pumper',tanker:'Tanker / Tender',brush:'Brush / Wildland',rescue:'Heavy Rescue',medrescue:'Medium Rescue + SCBA Cascade'};
+
+// ════════════════════════════════════════════════════
+// VIEW SWITCH
+// ════════════════════════════════════════════════════
+function switchView(v, btn) {
+  document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(e => e.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (v==='history') renderHistory();
+}
+
+// ════════════════════════════════════════════════════
+// RENDER STEPS
+// ════════════════════════════════════════════════════
+function renderStep() {
+  updateStepIndicator();
+  const fns = [null, step1, step2, step3, step4];
+  document.getElementById('step-content').innerHTML = fns[S.step]();
+  window.scrollTo(0,0);
+}
+
+function updateStepIndicator() {
+  for (let i=1;i<=4;i++) {
+    const el = document.getElementById('stepEl-'+i);
+    el.className = 'step'+(i<S.step?' done':i===S.step?' active':'');
+    el.querySelector('.step-num').textContent = i<S.step?'✓':i;
+  }
+}
+
+// ── Step 1: Unit ──────────────────────────────────
+function step1() {
+  return `
+    <div class="page-title">Select Unit</div>
+    <div class="page-subtitle">Choose the apparatus you are checking today.</div>
+    <div class="unit-grid">
+      ${UNITS.map(u=>`
+        <div class="unit-card ${S.unitId===u.id?'selected':''}" onclick="pickUnit('${u.id}')">
+          <span class="unit-icon">${u.icon}</span>
+          <div class="unit-name">${u.name}</div>
+          <div class="unit-type">${TYPE_LABEL[u.type]}</div>
+        </div>`).join('')}
+    </div>
+    <div class="nav-buttons">
+      <div></div>
+      <button class="btn btn-primary" onclick="nextStep()" ${!S.unitId?'disabled':''}>Continue → Details</button>
+    </div>`;
+}
+
+function pickUnit(id) {
+  if (S.unitId !== id) { S.unitId=id; S.items={}; }
+  renderStep();
+}
+
+// ── Step 2: Details ───────────────────────────────
+function step2() {
+  const now = new Date();
+  const d = S.info.date || now.toISOString().split('T')[0];
+  const t = S.info.time || now.toTimeString().slice(0,5);
+  const u = getUnit();
+  return `
+    <div class="page-title">Check Details</div>
+    <div class="page-subtitle">Unit: <strong>${u.name}</strong> &nbsp;·&nbsp; ${TYPE_LABEL[u.type]}</div>
+    <div class="section-card"><div style="padding:22px;">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Date <span class="required-mark">*</span></label>
+          <input class="form-input" type="date" id="iDate" value="${d}" oninput="si()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time <span class="required-mark">*</span></label>
+          <input class="form-input" type="time" id="iTime" value="${t}" oninput="si()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Performed By <span class="required-mark">*</span></label>
+        <input class="form-input" type="text" id="iPerformer" placeholder="Full name" value="${S.info.performer}" oninput="si()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Odometer / Engine Hours</label>
+        <input class="form-input" type="text" id="iMileage" placeholder="e.g. 12,450 mi or 340 hrs" value="${S.info.mileage}" oninput="si()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">General Notes (Optional)</label>
+        <textarea class="form-input" id="iNotes" placeholder="Any pre-check notes..." style="min-height:72px;resize:vertical;" oninput="si()">${S.info.notes}</textarea>
+      </div>
+    </div></div>
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="goChecklist()">Continue → Checklist</button>
+    </div>`;
+}
+
+function si() {
+  const m = {date:'iDate',time:'iTime',performer:'iPerformer',mileage:'iMileage',notes:'iNotes'};
+  Object.entries(m).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) S.info[k]=el.value; });
+}
+
+function goChecklist() {
+  si();
+  if (!S.info.performer.trim()) { toast('Enter the name of the person performing the check.','error'); return; }
+  // Pre-fill all items as PASS — checker only needs to change FAIL or N/A
+  getCL().forEach((sec, si) => {
+    sec.items.forEach((_, ii) => {
+      const key = `${si}-${ii}`;
+      if (!S.items[key]) S.items[key] = {status:'pass', note:'', photos:[]};
+    });
+  });
+  nextStep();
+}
+
+// ── Step 3: Checklist ─────────────────────────────
+function step3() {
+  const u = getUnit(), cl = getCL(), st = getStats();
+  const pct = st.total ? Math.round(st.checked/st.total*100) : 0;
+  return `
+    <div style="margin-bottom:18px;">
+      <div class="page-title">${u.name}</div>
+      <div style="font-size:13px;color:var(--text-muted);">${TYPE_LABEL[u.type]} · ${S.info.date} · ${S.info.performer}</div>
+    </div>
+    <div class="summary-stats">
+      <div class="stat-card"><div class="stat-value">${st.total}</div><div class="stat-label">Total</div></div>
+      <div class="stat-card pass"><div class="stat-value" id="spPass">${st.passed}</div><div class="stat-label">Pass</div></div>
+      <div class="stat-card fail"><div class="stat-value" id="spFail">${st.failed}</div><div class="stat-label">Fail</div></div>
+      <div class="stat-card na"><div class="stat-value" id="spNA">${st.na}</div><div class="stat-label">N/A</div></div>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pgBar" style="width:${pct}%"></div></div>
+    ${cl.map((sec,si)=>renderSec(sec,si)).join('')}
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="goReview()">Review & Submit →</button>
+    </div>`;
+}
+
+function renderSec(sec, si) {
+  const ss = secStats(si);
+  const dot = ss.failed>0?'has-fails':ss.checked===sec.items.length?'complete':ss.checked>0?'partial':'';
+  return `
+    <div class="section-card">
+      <div class="section-header" onclick="togSec(${si})">
+        <div class="section-title"><span class="section-status-dot ${dot}" id="dot-${si}"></span>${sec.title}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="section-progress" id="sp-${si}">${ss.checked}/${sec.items.length}</span>
+          <button class="collapse-btn" id="cb-${si}">▼</button>
+        </div>
+      </div>
+      <div class="section-body" id="sb-${si}">
+        ${sec.items.map((item,ii)=>renderItem(si,ii,item)).join('')}
+      </div>
+    </div>`;
+}
+
+function renderItem(si, ii, item) {
+  const key=`${si}-${ii}`, it=S.items[key]||{status:null,note:'',photos:[]};
+  const cls=it.status==='pass'?' passed':it.status==='fail'?' failed':'';
+  const dv=it.status==='fail'?' visible':'';
+  const photos=(it.photos||[]).map((p,pi)=>`<img class="photo-thumb" src="${p}" title="Click to remove" onclick="rmPhoto('${key}',${pi})">`).join('');
+  return `
+    <div class="checklist-item${cls}" id="ci-${key}">
+      <div class="item-row">
+        <div class="item-text">${item}</div>
+        <div class="status-buttons">
+          <button class="status-btn pass ${it.status==='pass'?'active':''}" onclick="setS('${key}','pass')">PASS</button>
+          <button class="status-btn fail ${it.status==='fail'?'active':''}" onclick="setS('${key}','fail')">FAIL</button>
+          <button class="status-btn na ${it.status==='na'?'active':''}" onclick="setS('${key}','na')">N/A</button>
+        </div>
+      </div>
+      <div class="item-deficiency${dv}" id="def-${key}">
+        <textarea class="deficiency-note" placeholder="Describe the deficiency..." rows="2" onchange="saveNote('${key}',this.value)">${it.note||''}</textarea>
+        <div class="photo-upload-area">
+          <label class="photo-btn" for="ph-${key}">📷 Add Photo</label>
+          <input type="file" id="ph-${key}" accept="image/*" style="display:none" onchange="addPhoto('${key}',this)">
+          <div id="pv-${key}">${photos}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function togSec(si) {
+  document.getElementById('sb-'+si).classList.toggle('collapsed');
+  document.getElementById('cb-'+si).classList.toggle('collapsed');
+}
+
+function setS(key, status) {
+  if (!S.items[key]) S.items[key]={status:null,note:'',photos:[]};
+  S.items[key].status=status;
+  const el=document.getElementById('ci-'+key);
+  el.className='checklist-item'+(status==='pass'?' passed':status==='fail'?' failed':'');
+  ['pass','fail','na'].forEach(s=>el.querySelector('.status-btn.'+s)?.classList.toggle('active',s===status));
+  const def=document.getElementById('def-'+key);
+  if(def) def.className='item-deficiency'+(status==='fail'?' visible':'');
+  refreshStats(); refreshDot(parseInt(key.split('-')[0]));
+}
+
+function saveNote(key,val) { if(!S.items[key]) S.items[key]={status:null,note:'',photos:[]}; S.items[key].note=val; }
+
+function addPhoto(key,input) {
+  const file=input.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    if(!S.items[key]) S.items[key]={status:null,note:'',photos:[]};
+    if(!S.items[key].photos) S.items[key].photos=[];
+    const idx=S.items[key].photos.length;
+    S.items[key].photos.push(e.target.result);
+    const pv=document.getElementById('pv-'+key);
+    const img=document.createElement('img');
+    img.className='photo-thumb'; img.src=e.target.result; img.title='Click to remove';
+    img.onclick=()=>rmPhoto(key,idx); pv.appendChild(img); input.value='';
+  };
+  r.readAsDataURL(file);
+}
+
+function rmPhoto(key,idx) {
+  if(!S.items[key]?.photos) return;
+  S.items[key].photos.splice(idx,1);
+  const pv=document.getElementById('pv-'+key);
+  if(pv) pv.innerHTML=S.items[key].photos.map((p,pi)=>`<img class="photo-thumb" src="${p}" title="Click to remove" onclick="rmPhoto('${key}',${pi})">`).join('');
+}
+
+function getStats() {
+  const cl=getCL(); let total=0,passed=0,failed=0,na=0;
+  cl.forEach((sec,si)=>sec.items.forEach((_,ii)=>{
+    total++;
+    const s=S.items[`${si}-${ii}`]?.status;
+    if(s==='pass') passed++; else if(s==='fail') failed++; else if(s==='na') na++;
+  }));
+  return {total,passed,failed,na,checked:passed+failed+na};
+}
+
+function secStats(si) {
+  const items=getCL()[si]?.items||[]; let checked=0,failed=0;
+  items.forEach((_,ii)=>{const s=S.items[`${si}-${ii}`]?.status; if(s) checked++; if(s==='fail') failed++;});
+  return {checked,failed,total:items.length};
+}
+
+function refreshStats() {
+  const st=getStats(), pct=st.total?Math.round(st.checked/st.total*100):0;
+  const pb=document.getElementById('pgBar'); if(pb) pb.style.width=pct+'%';
+  const ep=document.getElementById('spPass'), ef=document.getElementById('spFail'), en=document.getElementById('spNA');
+  if(ep) ep.textContent=st.passed; if(ef) ef.textContent=st.failed; if(en) en.textContent=st.na;
+}
+
+function refreshDot(si) {
+  const ss=secStats(si), dot=document.getElementById('dot-'+si), prog=document.getElementById('sp-'+si);
+  if(!dot) return;
+  dot.className='section-status-dot'+(ss.failed>0?' has-fails':ss.checked===ss.total?' complete':ss.checked>0?' partial':'');
+  if(prog) prog.textContent=`${ss.checked}/${ss.total}`;
+}
+
+function goReview() {
+  const st=getStats(), rem=st.total-st.checked;
+  if(rem>0 && !confirm(`${rem} item(s) not yet marked. Submit anyway?`)) return;
+  nextStep();
+}
+
+// ── Step 4: Review ────────────────────────────────
+function step4() {
+  const u=getUnit(), st=getStats(), defs=getDefs(), hasDefs=defs.length>0;
+  const configured = EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY';
+  return `
+    <div class="page-title">Review & Submit</div>
+    <div class="page-subtitle">Confirm before sending to TruckChecks@quapawfire.com</div>
+    ${!configured?`<div class="config-warn">⚠ EmailJS not configured yet. Check will save to history but email will not send until you add your keys.</div>`:''}
+    <div class="section-card" style="margin-bottom:14px;"><div style="padding:18px 20px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px;">
+        <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Unit</span><strong>${u.name}</strong></div>
+        <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Type</span>${TYPE_LABEL[u.type]}</div>
+        <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Date / Time</span>${S.info.date} at ${S.info.time}</div>
+        <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Performed By</span><strong>${S.info.performer}</strong></div>
+        ${S.info.mileage?`<div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Odo / Hours</span>${S.info.mileage}</div>`:''}
+        ${S.info.notes?`<div style="grid-column:1/-1;"><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Notes</span>${S.info.notes}</div>`:''}
+      </div>
+    </div></div>
+    <div class="summary-stats">
+      <div class="stat-card"><div class="stat-value">${st.total}</div><div class="stat-label">Total</div></div>
+      <div class="stat-card pass"><div class="stat-value">${st.passed}</div><div class="stat-label">Pass</div></div>
+      <div class="stat-card fail"><div class="stat-value">${st.failed}</div><div class="stat-label">Fail</div></div>
+      <div class="stat-card na"><div class="stat-value">${st.na}</div><div class="stat-label">N/A</div></div>
+    </div>
+    <div class="status-banner ${hasDefs?'has-deficiencies':'all-clear'}">
+      ${hasDefs?`⚠ ${defs.length} deficiency(ies) found — flagged in report.`:`✓ All checked items passed — ${u.name} is good to go.`}
+    </div>
+    ${hasDefs?`
+      <div style="margin-bottom:20px;">
+        <div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:8px;">Deficiencies</div>
+        ${defs.map(d=>`
+          <div class="deficiency-entry">
+            <div class="deficiency-section">${d.section}</div>
+            <div class="deficiency-item-name">${d.item}</div>
+            ${d.note?`<div class="deficiency-item-note">${d.note}</div>`:''}
+            ${d.photos?.length?`<div style="margin-top:6px;display:flex;gap:4px;">${d.photos.map(p=>`<img src="${p}" style="width:42px;height:42px;object-fit:cover;border-radius:3px;border:1px solid var(--border);">`).join('')}</div>`:''}
+          </div>`).join('')}
+      </div>` : ''}
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+      <button class="btn btn-success" onclick="submitCheck()">✓ Submit Report</button>
+    </div>`;
+}
+
+function getDefs() {
+  const cl=getCL(), defs=[];
+  cl.forEach((sec,si)=>sec.items.forEach((item,ii)=>{
+    const key=`${si}-${ii}`;
+    if(S.items[key]?.status==='fail') defs.push({section:sec.title,item,note:S.items[key].note||'',photos:S.items[key].photos||[]});
+  }));
+  return defs;
+}
+
+// ════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════
+function nextStep() { if(S.step<4){S.step++;renderStep();} }
+function prevStep() { if(S.step>1){S.step--;renderStep();} }
+
+// ════════════════════════════════════════════════════
+// SUBMIT
+// ════════════════════════════════════════════════════
+async function submitCheck() {
+  const u=getUnit(), st=getStats(), defs=getDefs(), cl=getCL();
+
+  // Build plain-text report for email
+  const line = s => s+'\n';
+  const ruler = c => c.repeat(52)+'\n';
+  let r='';
+  r+=line('QUAPAW VOLUNTEER FIRE DEPARTMENT');
+  r+=line('APPARATUS CHECK REPORT');
+  r+=ruler('═');
+  r+=line(`Unit:         ${u.name}`);
+  r+=line(`Type:         ${TYPE_LABEL[u.type]}`);
+  r+=line(`Date / Time:  ${S.info.date} at ${S.info.time}`);
+  r+=line(`Performed By: ${S.info.performer}`);
+  if(S.info.mileage) r+=line(`Odo / Hours:  ${S.info.mileage}`);
+  if(S.info.notes)   r+=line(`Notes:        ${S.info.notes}`);
+  r+='\n';
+  r+=line(`RESULTS: ${st.passed} PASS  |  ${st.failed} FAIL  |  ${st.na} N/A  |  ${st.total-st.checked} UNCHECKED`);
+  r+=defs.length>0 ? line(`STATUS:  ⚠ ${defs.length} DEFICIENCY(IES) — FOLLOW-UP REQUIRED`) : line('STATUS:  ✓ ALL CLEAR');
+  if(defs.length>0) {
+    r+='\n'+ruler('─');
+    r+=line('DEFICIENCIES');
+    r+=ruler('─');
+    defs.forEach((d,i)=>{
+      r+=line(`\n${i+1}. [${d.section}]`);
+      r+=line(`   ${d.item}`);
+      if(d.note) r+=line(`   Note: ${d.note}`);
+      if(d.photos?.length) r+=line(`   Photos: ${d.photos.length} attached`);
+    });
+  }
+  r+='\n'+ruler('─');
+  r+=line('FULL CHECKLIST');
+  r+=ruler('─');
+  cl.forEach((sec,si)=>{
+    r+='\n'+line(sec.title.toUpperCase());
+    sec.items.forEach((item,ii)=>{
+      const key=`${si}-${ii}`, s=(S.items[key]?.status||'unchecked').toUpperCase().padEnd(9);
+      r+=line(`  [${s}] ${item}`);
+      if(S.items[key]?.note) r+=line(`             → ${S.items[key].note}`);
+    });
+  });
+  r+='\n'+ruler('═');
+  r+=line('Generated by QFD Apparatus Check System — quapawfire.com');
+
+  // Save to history first
+  const payload={
+    id:Date.now().toString(), timestamp:new Date().toISOString(),
+    unitId:S.unitId, unitName:u.name, type:u.type,
+    date:S.info.date, time:S.info.time, performer:S.info.performer,
+    mileage:S.info.mileage, notes:S.info.notes, stats:st, deficiencies:defs,
+    checklist:cl.map((sec,si)=>({title:sec.title,items:sec.items.map((item,ii)=>{
+      const key=`${si}-${ii}`;
+      return {item,status:S.items[key]?.status||'unchecked',note:S.items[key]?.note||'',photos:S.items[key]?.photos||[]};
+    })}))
+  };
+  saveToHistory(payload);
+
+  if(EMAILJS_PUBLIC_KEY==='YOUR_PUBLIC_KEY') {
+    toast('Saved to history. Add EmailJS keys to enable email.','error');
+    setTimeout(resetApp,2200); return;
+  }
+
+  document.getElementById('loadingOverlay').classList.add('visible');
+  const subj=`[QFD Check] ${u.name} — ${S.info.date} — ${defs.length>0?'⚠ '+defs.length+' DEFICIENCY':'✓ ALL CLEAR'}`;
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {subject:subj, to_email:'TruckChecks@quapawfire.com', report:r});
+    document.getElementById('loadingOverlay').classList.remove('visible');
+    toast('✓ Report sent to TruckChecks@quapawfire.com','success');
+    setTimeout(resetApp,2000);
+  } catch(err) {
+    document.getElementById('loadingOverlay').classList.remove('visible');
+    toast('Email failed: '+(err?.text||err?.message||'Unknown error')+' — Check saved to history.','error');
+    setTimeout(resetApp,3000);
+  }
+}
+
+function resetApp() {
+  S={step:1,unitId:null,info:{date:'',time:'',performer:'',mileage:'',notes:''},items:{}};
+  renderStep();
+}
+
+// ════════════════════════════════════════════════════
+// HISTORY
+// ════════════════════════════════════════════════════
+function saveToHistory(p) {
+  const h=getHistory(); h.unshift(p);
+  localStorage.setItem('qfd_history',JSON.stringify(h.slice(0,100)));
+}
+function getHistory() { try{return JSON.parse(localStorage.getItem('qfd_history')||'[]');}catch{return[];} }
+
+function renderHistory() {
+  const h=getHistory(), c=document.getElementById('historyContent');
+  if(!h.length) { c.innerHTML=`<div class="empty-state"><div style="font-size:48px;margin-bottom:14px;">📋</div><div style="font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;text-transform:uppercase;margin-bottom:6px;">No Check History</div><p style="font-size:14px;">Completed checks appear here.</p></div>`; return; }
+  c.innerHTML=`
+    <div class="section-card">
+      <table class="history-table">
+        <thead><tr><th>Date</th><th>Unit</th><th>Performed By</th><th>Result</th><th></th></tr></thead>
+        <tbody>${h.map(x=>`
+          <tr>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${x.date}<br><span style="color:var(--text-muted)">${x.time}</span></td>
+            <td><strong>${x.unitName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${TYPE_LABEL[x.type]||x.type}</span></td>
+            <td>${x.performer}</td>
+            <td>${x.stats?.failed>0?`<span class="badge badge-fail">⚠ ${x.stats.failed} FAIL</span>`:`<span class="badge badge-pass">✓ CLEAR</span>`}</td>
+            <td><button class="link-btn" onclick="viewDetail('${x.id}')">View</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function viewDetail(id) {
+  const h=getHistory().find(x=>x.id===id); if(!h) return;
+  const defs=h.deficiencies||[];
+  document.getElementById('modalTitle').textContent=`${h.unitName} — ${h.date}`;
+  document.getElementById('modalBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;font-size:14px;">
+      <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Unit</span><strong>${h.unitName}</strong></div>
+      <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Performed By</span>${h.performer}</div>
+      <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Date / Time</span>${h.date} at ${h.time}</div>
+      ${h.mileage?`<div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Odo / Hours</span>${h.mileage}</div>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;">
+      ${['total','passed','failed','na'].map(k=>`
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px;text-align:center;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:${k==='passed'?'#4ade80':k==='failed'?'#f87171':'var(--text)'};">${h.stats?.[k]||0}</div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">${k}</div>
+        </div>`).join('')}
+    </div>
+    ${defs.length>0?`
+      <div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:8px;">Deficiencies</div>
+      ${defs.map(d=>`
+        <div class="deficiency-entry">
+          <div class="deficiency-section">${d.section}</div>
+          <div class="deficiency-item-name">${d.item}</div>
+          ${d.note?`<div class="deficiency-item-note">${d.note}</div>`:''}
+          ${d.photos?.length?`<div style="margin-top:6px;display:flex;gap:4px;">${d.photos.map(p=>`<img src="${p}" style="width:48px;height:48px;object-fit:cover;border-radius:3px;border:1px solid var(--border);">`).join('')}</div>`:''}
+        </div>`).join('')}`
+    :`<div style="text-align:center;color:var(--text-muted);padding:16px;font-size:14px;">✓ No deficiencies on this check.</div>`}`;
+  document.getElementById('historyModal').classList.add('visible');
+}
+
+function closeModal() { document.getElementById('historyModal').classList.remove('visible'); }
+
+function clearHistory() {
+  if(confirm('Clear all check history from this device? Cannot be undone.')) {
+    localStorage.removeItem('qfd_history'); renderHistory(); toast('History cleared.','success');
+  }
+}
+
+// ════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════
+function toast(msg, type='success') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} visible`;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('visible'),5000);
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+renderStep();
+</script>
+</body>
+</html>
