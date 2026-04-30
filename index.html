@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -13,12 +14,15 @@
      3. Create an Email Template with ONE variable: {{{report}}}
      4. Replace the three placeholder values below with your IDs
      ════════════════════════════════════════════════════════════ -->
+
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 <script>
-  const EMAILJS_PUBLIC_KEY  = 'ycLQ57A_3TaYrVXel';   // ← replace
-  const EMAILJS_SERVICE_ID  = 'service_1t5c2es';   // ← replace
-  const EMAILJS_TEMPLATE_ID = 'template_z853n2o';  // ← replace
+  const EMAILJS_PUBLIC_KEY  = 'ycLQ57A_3TaYrVXel';
+  const EMAILJS_SERVICE_ID  = 'service_1t5c2es';
+  const EMAILJS_TEMPLATE_ID = 'template_z853n2o';
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
   const SUPABASE_URL  = 'https://ocfsqxjcefynkfzzdiga.supabase.co';
@@ -76,8 +80,11 @@ body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-
 .status-btn.pass.active{background:var(--pass-bg);border-color:var(--green);color:#4ade80;}
 .status-btn.fail.active{background:var(--fail-bg);border-color:var(--red);color:#f87171;}
 .status-btn.na.active{background:rgba(139,148,158,.1);border-color:var(--text-muted);color:var(--text-muted);}
+.status-btn.corr.active{background:rgba(245,158,11,.12);border-color:var(--amber);color:var(--amber);}
 .checklist-item.failed{background:rgba(220,38,38,.05);}
 .checklist-item.passed{background:rgba(22,163,74,.03);}
+.checklist-item.corrected{background:rgba(245,158,11,.04);}
+.carry-flag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.5px;color:#f87171;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);border-radius:3px;padding:1px 5px;margin-left:8px;vertical-align:middle;}
 .item-deficiency{padding:0 20px 12px 52px;display:none;}
 .item-deficiency.visible{display:block;}
 .deficiency-note{width:100%;background:var(--bg);border:1px solid rgba(220,38,38,.4);border-radius:4px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;padding:8px 12px;resize:vertical;min-height:58px;margin-bottom:8px;}
@@ -114,12 +121,13 @@ body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-
 .nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:24px;border-top:1px solid var(--border);}
 .progress-bar-wrap{background:var(--surface2);border-radius:4px;height:5px;margin-bottom:22px;overflow:hidden;}
 .progress-bar-fill{height:100%;background:var(--red);border-radius:4px;transition:width .4s ease;}
-.summary-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.summary-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
 .stat-value{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;line-height:1;margin-bottom:3px;}
 .stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);}
 .stat-card.pass .stat-value{color:#4ade80;}
 .stat-card.fail .stat-value{color:#f87171;}
+.stat-card.corr .stat-value{color:var(--amber);}
 .stat-card.na .stat-value{color:var(--text-muted);}
 .status-banner{padding:13px 18px;border-radius:var(--radius);margin-bottom:20px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:10px;}
 .status-banner.all-clear{background:rgba(22,163,74,.15);border:1px solid #16a34a;color:#4ade80;}
@@ -162,12 +170,13 @@ body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-
 .config-warn{background:rgba(245,158,11,.1);border:1px solid var(--amber);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--amber);margin-bottom:20px;}
 @media(max-width:640px){
   .app-header{padding:0 14px;}.app-main{padding:18px 14px;}
-  .form-grid{grid-template-columns:1fr;}.summary-stats{grid-template-columns:repeat(2,1fr);}
+  .form-grid{grid-template-columns:1fr;}.summary-stats{grid-template-columns:repeat(3,1fr);}
   .unit-grid{grid-template-columns:repeat(2,1fr);}.step-label{display:none;}
   .logo-sub{display:none;}.item-row{padding:10px 14px;gap:10px;}
   .item-deficiency{padding:0 14px 12px 14px;}.status-btn{width:44px;font-size:10px;}
 }
 </style>
+
 </head>
 <body>
 
@@ -175,7 +184,7 @@ body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-
   <div class="loader">
     <div class="spinner"></div>
     <div style="font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:2px;text-transform:uppercase;">Submitting Report</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Sending to quapawfiredepartment@gmail.com...</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Sending to TruckChecks@quapawfire.com...</div>
   </div>
 </div>
 
@@ -243,7 +252,7 @@ const UNITS = [
   {id:'eng21',    name:'Engine 21',     type:'engine',    icon:'🚒'},
   {id:'eng22',    name:'Engine 22',     type:'engine',    icon:'🚒'},
   {id:'res23',    name:'Rescue 23',     type:'rescue',    icon:'🔧'},
-  {id:'medres',   name:'Rescue 11',     type:'medrescue', icon:'💨'},
+  {id:'medres',   name:'Medium Rescue', type:'medrescue', icon:'💨'},
   {id:'tank2',    name:'Tanker 2',      type:'tanker',    icon:'🚛'},
   {id:'tank25',   name:'Tanker 25',     type:'tanker',    icon:'🚛'},
 ];
@@ -395,317 +404,292 @@ function step2() {
       <div class="form-group">
         <label class="form-label">General Notes (Optional)</label>
         <textarea class="form-input" id="iNotes" placeholder="Any pre-check notes..." style="min-height:72px;resize:vertical;" oninput="si()">${S.info.notes}</textarea>
-      </div>
-    </div></div>
-    <div class="nav-buttons">
-      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-      <button class="btn btn-primary" onclick="goChecklist()">Continue → Checklist</button>
-    </div>`;
+
+```
+  </div>
+</div></div>
+<div class="nav-buttons">
+  <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+  <button class="btn btn-primary" onclick="goChecklist()">Continue → Checklist</button>
+</div>`;
+```
+
 }
 
 function si() {
-  const m = {date:'iDate',time:'iTime',performer:'iPerformer',mileage:'iMileage',notes:'iNotes'};
-  Object.entries(m).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) S.info[k]=el.value; });
+const m = {date:‘iDate’,time:‘iTime’,performer:‘iPerformer’,mileage:‘iMileage’,notes:‘iNotes’};
+Object.entries(m).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) S.info[k]=el.value; });
 }
 
-function goChecklist() {
-  si();
-  if (!S.info.performer.trim()) { toast('Enter the name of the person performing the check.','error'); return; }
-  // Pre-fill all items as PASS — checker only needs to change FAIL or N/A
-  getCL().forEach((sec, si) => {
-    sec.items.forEach((_, ii) => {
-      const key = `${si}-${ii}`;
-      if (!S.items[key]) S.items[key] = {status:'pass', note:'', photos:[]};
-    });
-  });
-  nextStep();
+async function goChecklist() {
+si();
+if (!S.info.performer.trim()) { toast(‘Enter the name of the person performing the check.’,‘error’); return; }
+// Pre-fill all items as PASS
+getCL().forEach((sec, si) => {
+sec.items.forEach((_, ii) => {
+const key = `${si}-${ii}`;
+if (!S.items[key]) S.items[key] = {status:‘pass’, note:’’, photos:[], carriedFail:false};
+});
+});
+// Fetch most recent check for this unit — carry forward any FAIL items
+try {
+const { data } = await db
+.from(‘apparatus_checks’)
+.select(‘checklist’)
+.eq(‘unit_id’, S.unitId)
+.order(‘date’, { ascending: false })
+.order(‘time’, { ascending: false })
+.limit(1)
+.single();
+if (data?.checklist) {
+data.checklist.forEach((sec, si) => {
+sec.items?.forEach((item, ii) => {
+if (item.status === ‘fail’) {
+const key = `${si}-${ii}`;
+S.items[key] = {status:‘fail’, note:item.note||’’, photos:[], carriedFail:true};
+}
+});
+});
+}
+} catch(e) { /* no previous check found — fine */ }
+nextStep();
 }
 
 // ── Step 3: Checklist ─────────────────────────────
 function step3() {
-  const u = getUnit(), cl = getCL(), st = getStats();
-  const pct = st.total ? Math.round(st.checked/st.total*100) : 0;
-  return `
-    <div style="margin-bottom:18px;">
-      <div class="page-title">${u.name}</div>
-      <div style="font-size:13px;color:var(--text-muted);">${TYPE_LABEL[u.type]} · ${S.info.date} · ${S.info.performer}</div>
-    </div>
-    <div class="summary-stats">
-      <div class="stat-card"><div class="stat-value">${st.total}</div><div class="stat-label">Total</div></div>
-      <div class="stat-card pass"><div class="stat-value" id="spPass">${st.passed}</div><div class="stat-label">Pass</div></div>
-      <div class="stat-card fail"><div class="stat-value" id="spFail">${st.failed}</div><div class="stat-label">Fail</div></div>
-      <div class="stat-card na"><div class="stat-value" id="spNA">${st.na}</div><div class="stat-label">N/A</div></div>
-    </div>
-    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pgBar" style="width:${pct}%"></div></div>
-    ${cl.map((sec,si)=>renderSec(sec,si)).join('')}
-    <div class="nav-buttons">
-      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-      <button class="btn btn-primary" onclick="goReview()">Review & Submit →</button>
-    </div>`;
+const u = getUnit(), cl = getCL(), st = getStats();
+const pct = st.total ? Math.round(st.checked/st.total*100) : 0;
+return ` <div style="margin-bottom:18px;"> <div class="page-title">${u.name}</div> <div style="font-size:13px;color:var(--text-muted);">${TYPE_LABEL[u.type]} · ${S.info.date} · ${S.info.performer}</div> </div> <div class="summary-stats"> <div class="stat-card"><div class="stat-value">${st.total}</div><div class="stat-label">Total</div></div> <div class="stat-card pass"><div class="stat-value" id="spPass">${st.passed}</div><div class="stat-label">Pass</div></div> <div class="stat-card fail"><div class="stat-value" id="spFail">${st.failed}</div><div class="stat-label">Fail</div></div> <div class="stat-card corr"><div class="stat-value" id="spCorr">${st.corrected}</div><div class="stat-label">Corr</div></div> <div class="stat-card na"><div class="stat-value" id="spNA">${st.na}</div><div class="stat-label">N/A</div></div> </div> <div class="progress-bar-wrap"><div class="progress-bar-fill" id="pgBar" style="width:${pct}%"></div></div> ${cl.map((sec,si)=>renderSec(sec,si)).join('')} <div class="nav-buttons"> <button class="btn btn-secondary" onclick="prevStep()">← Back</button> <button class="btn btn-primary" onclick="goReview()">Review & Submit →</button> </div>`;
 }
 
 function renderSec(sec, si) {
-  const ss = secStats(si);
-  const dot = ss.failed>0?'has-fails':ss.checked===sec.items.length?'complete':ss.checked>0?'partial':'';
-  return `
-    <div class="section-card">
-      <div class="section-header" onclick="togSec(${si})">
-        <div class="section-title"><span class="section-status-dot ${dot}" id="dot-${si}"></span>${sec.title}</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span class="section-progress" id="sp-${si}">${ss.checked}/${sec.items.length}</span>
-          <button class="collapse-btn" id="cb-${si}">▼</button>
-        </div>
-      </div>
-      <div class="section-body" id="sb-${si}">
-        ${sec.items.map((item,ii)=>renderItem(si,ii,item)).join('')}
-      </div>
-    </div>`;
+const ss = secStats(si);
+const dot = ss.failed>0?‘has-fails’:ss.checked===sec.items.length?‘complete’:ss.checked>0?‘partial’:’’;
+return ` <div class="section-card"> <div class="section-header" onclick="togSec(${si})"> <div class="section-title"><span class="section-status-dot ${dot}" id="dot-${si}"></span>${sec.title}</div> <div style="display:flex;align-items:center;gap:10px;"> <span class="section-progress" id="sp-${si}">${ss.checked}/${sec.items.length}</span> <button class="collapse-btn" id="cb-${si}">▼</button> </div> </div> <div class="section-body" id="sb-${si}"> ${sec.items.map((item,ii)=>renderItem(si,ii,item)).join('')} </div> </div>`;
 }
 
 function renderItem(si, ii, item) {
-  const key=`${si}-${ii}`, it=S.items[key]||{status:null,note:'',photos:[]};
-  const cls=it.status==='pass'?' passed':it.status==='fail'?' failed':'';
-  const dv=it.status==='fail'?' visible':'';
-  const photos=(it.photos||[]).map((p,pi)=>`<img class="photo-thumb" src="${p}" title="Click to remove" onclick="rmPhoto('${key}',${pi})">`).join('');
-  return `
-    <div class="checklist-item${cls}" id="ci-${key}">
-      <div class="item-row">
-        <div class="item-text">${item}</div>
-        <div class="status-buttons">
-          <button class="status-btn pass ${it.status==='pass'?'active':''}" onclick="setS('${key}','pass')">PASS</button>
-          <button class="status-btn fail ${it.status==='fail'?'active':''}" onclick="setS('${key}','fail')">FAIL</button>
-          <button class="status-btn na ${it.status==='na'?'active':''}" onclick="setS('${key}','na')">N/A</button>
-        </div>
-      </div>
-      <div class="item-deficiency${dv}" id="def-${key}">
-        <textarea class="deficiency-note" placeholder="Describe the deficiency..." rows="2" onchange="saveNote('${key}',this.value)">${it.note||''}</textarea>
-        <div class="photo-upload-area">
-          <label class="photo-btn" for="ph-${key}">📷 Add Photo</label>
-          <input type="file" id="ph-${key}" accept="image/*" style="display:none" onchange="addPhoto('${key}',this)">
-          <div id="pv-${key}">${photos}</div>
-        </div>
-      </div>
-    </div>`;
+const key=`${si}-${ii}`, it=S.items[key]||{status:null,note:’’,photos:[]};
+const cls=it.status===‘pass’?’ passed’:it.status===‘fail’?’ failed’:it.status===‘corrected’?’ corrected’:’’;
+const dv=(it.status===‘fail’||it.status===‘corrected’)?’ visible’:’’;
+const isCarried = it.carriedFail === true;
+const notePlaceholder = it.status===‘corrected’ ? ‘Describe what was corrected…’ : ‘Describe the deficiency…’;
+const photos=(it.photos||[]).map((p,pi)=>`<img class="photo-thumb" src="${p}" title="Click to remove" onclick="rmPhoto('${key}',${pi})">`).join(’’);
+return ` <div class="checklist-item${cls}" id="ci-${key}"> <div class="item-row"> <div class="item-text">${item}${isCarried?'<span class="carry-flag">PREV FAIL</span>':''}</div> <div class="status-buttons"> <button class="status-btn pass ${it.status==='pass'?'active':''}" onclick="setS('${key}','pass')">PASS</button> <button class="status-btn fail ${it.status==='fail'?'active':''}" onclick="setS('${key}','fail')">FAIL</button> <button class="status-btn corr ${it.status==='corrected'?'active':''}" onclick="setS('${key}','corrected')">CORR</button> <button class="status-btn na ${it.status==='na'?'active':''}" onclick="setS('${key}','na')">N/A</button> </div> </div> <div class="item-deficiency${dv}" id="def-${key}"> <textarea class="deficiency-note" placeholder="${notePlaceholder}" rows="2" onchange="saveNote('${key}',this.value)">${it.note||''}</textarea> <div class="photo-upload-area"> <label class="photo-btn" for="ph-${key}">📷 Add Photo</label> <input type="file" id="ph-${key}" accept="image/*" style="display:none" onchange="addPhoto('${key}',this)"> <div id="pv-${key}">${photos}</div> </div> </div> </div>`;
 }
 
 function togSec(si) {
-  document.getElementById('sb-'+si).classList.toggle('collapsed');
-  document.getElementById('cb-'+si).classList.toggle('collapsed');
+document.getElementById(‘sb-’+si).classList.toggle(‘collapsed’);
+document.getElementById(‘cb-’+si).classList.toggle(‘collapsed’);
 }
 
 function setS(key, status) {
-  if (!S.items[key]) S.items[key]={status:null,note:'',photos:[]};
-  S.items[key].status=status;
-  const el=document.getElementById('ci-'+key);
-  el.className='checklist-item'+(status==='pass'?' passed':status==='fail'?' failed':'');
-  ['pass','fail','na'].forEach(s=>el.querySelector('.status-btn.'+s)?.classList.toggle('active',s===status));
-  const def=document.getElementById('def-'+key);
-  if(def) def.className='item-deficiency'+(status==='fail'?' visible':'');
-  refreshStats(); refreshDot(parseInt(key.split('-')[0]));
+if (!S.items[key]) S.items[key]={status:null,note:’’,photos:[]};
+S.items[key].status=status;
+const el=document.getElementById(‘ci-’+key);
+el.className=‘checklist-item’+(status===‘pass’?’ passed’:status===‘fail’?’ failed’:status===‘corrected’?’ corrected’:’’);
+[‘pass’,‘fail’,‘corr’,‘na’].forEach(s=>el.querySelector(’.status-btn.’+s)?.classList.toggle(‘active’,
+(s===‘corr’?‘corrected’:s)===status));
+const def=document.getElementById(‘def-’+key);
+if(def) {
+def.className=‘item-deficiency’+((status===‘fail’||status===‘corrected’)?’ visible’:’’);
+const ta=def.querySelector(‘textarea’);
+if(ta) ta.placeholder = status===‘corrected’?‘Describe what was corrected…’:‘Describe the deficiency…’;
+}
+refreshStats(); refreshDot(parseInt(key.split(’-’)[0]));
 }
 
-function saveNote(key,val) { if(!S.items[key]) S.items[key]={status:null,note:'',photos:[]}; S.items[key].note=val; }
+function saveNote(key,val) { if(!S.items[key]) S.items[key]={status:null,note:’’,photos:[]}; S.items[key].note=val; }
 
 function addPhoto(key,input) {
-  const file=input.files[0]; if(!file) return;
-  const r=new FileReader();
-  r.onload=e=>{
-    if(!S.items[key]) S.items[key]={status:null,note:'',photos:[]};
-    if(!S.items[key].photos) S.items[key].photos=[];
-    const idx=S.items[key].photos.length;
-    S.items[key].photos.push(e.target.result);
-    const pv=document.getElementById('pv-'+key);
-    const img=document.createElement('img');
-    img.className='photo-thumb'; img.src=e.target.result; img.title='Click to remove';
-    img.onclick=()=>rmPhoto(key,idx); pv.appendChild(img); input.value='';
-  };
-  r.readAsDataURL(file);
+const file=input.files[0]; if(!file) return;
+const r=new FileReader();
+r.onload=e=>{
+if(!S.items[key]) S.items[key]={status:null,note:’’,photos:[]};
+if(!S.items[key].photos) S.items[key].photos=[];
+const idx=S.items[key].photos.length;
+S.items[key].photos.push(e.target.result);
+const pv=document.getElementById(‘pv-’+key);
+const img=document.createElement(‘img’);
+img.className=‘photo-thumb’; img.src=e.target.result; img.title=‘Click to remove’;
+img.onclick=()=>rmPhoto(key,idx); pv.appendChild(img); input.value=’’;
+};
+r.readAsDataURL(file);
 }
 
 function rmPhoto(key,idx) {
-  if(!S.items[key]?.photos) return;
-  S.items[key].photos.splice(idx,1);
-  const pv=document.getElementById('pv-'+key);
-  if(pv) pv.innerHTML=S.items[key].photos.map((p,pi)=>`<img class="photo-thumb" src="${p}" title="Click to remove" onclick="rmPhoto('${key}',${pi})">`).join('');
+if(!S.items[key]?.photos) return;
+S.items[key].photos.splice(idx,1);
+const pv=document.getElementById(‘pv-’+key);
+if(pv) pv.innerHTML=S.items[key].photos.map((p,pi)=>`<img class="photo-thumb" src="${p}" title="Click to remove" onclick="rmPhoto('${key}',${pi})">`).join(’’);
 }
 
 function getStats() {
-  const cl=getCL(); let total=0,passed=0,failed=0,na=0;
-  cl.forEach((sec,si)=>sec.items.forEach((_,ii)=>{
-    total++;
-    const s=S.items[`${si}-${ii}`]?.status;
-    if(s==='pass') passed++; else if(s==='fail') failed++; else if(s==='na') na++;
-  }));
-  return {total,passed,failed,na,checked:passed+failed+na};
+const cl=getCL(); let total=0,passed=0,failed=0,corrected=0,na=0;
+cl.forEach((sec,si)=>sec.items.forEach((_,ii)=>{
+total++;
+const s=S.items[`${si}-${ii}`]?.status;
+if(s===‘pass’) passed++; else if(s===‘fail’) failed++; else if(s===‘corrected’) corrected++; else if(s===‘na’) na++;
+}));
+return {total,passed,failed,corrected,na,checked:passed+failed+corrected+na};
 }
 
 function secStats(si) {
-  const items=getCL()[si]?.items||[]; let checked=0,failed=0;
-  items.forEach((_,ii)=>{const s=S.items[`${si}-${ii}`]?.status; if(s) checked++; if(s==='fail') failed++;});
-  return {checked,failed,total:items.length};
+const items=getCL()[si]?.items||[]; let checked=0,failed=0,corrected=0;
+items.forEach((_,ii)=>{
+const s=S.items[`${si}-${ii}`]?.status;
+if(s) checked++;
+if(s===‘fail’) failed++;
+if(s===‘corrected’) corrected++;
+});
+return {checked,failed,corrected,total:items.length};
 }
 
 function refreshStats() {
-  const st=getStats(), pct=st.total?Math.round(st.checked/st.total*100):0;
-  const pb=document.getElementById('pgBar'); if(pb) pb.style.width=pct+'%';
-  const ep=document.getElementById('spPass'), ef=document.getElementById('spFail'), en=document.getElementById('spNA');
-  if(ep) ep.textContent=st.passed; if(ef) ef.textContent=st.failed; if(en) en.textContent=st.na;
+const st=getStats(), pct=st.total?Math.round(st.checked/st.total*100):0;
+const pb=document.getElementById(‘pgBar’); if(pb) pb.style.width=pct+’%’;
+const ep=document.getElementById(‘spPass’), ef=document.getElementById(‘spFail’);
+const ec=document.getElementById(‘spCorr’), en=document.getElementById(‘spNA’);
+if(ep) ep.textContent=st.passed; if(ef) ef.textContent=st.failed;
+if(ec) ec.textContent=st.corrected; if(en) en.textContent=st.na;
 }
 
 function refreshDot(si) {
-  const ss=secStats(si), dot=document.getElementById('dot-'+si), prog=document.getElementById('sp-'+si);
-  if(!dot) return;
-  dot.className='section-status-dot'+(ss.failed>0?' has-fails':ss.checked===ss.total?' complete':ss.checked>0?' partial':'');
-  if(prog) prog.textContent=`${ss.checked}/${ss.total}`;
+const ss=secStats(si), dot=document.getElementById(‘dot-’+si), prog=document.getElementById(‘sp-’+si);
+if(!dot) return;
+dot.className=‘section-status-dot’+(ss.failed>0?’ has-fails’:(ss.corrected>0&&ss.failed===0&&ss.checked===ss.total)?’ partial’:ss.checked===ss.total?’ complete’:ss.checked>0?’ partial’:’’);
+if(prog) prog.textContent=`${ss.checked}/${ss.total}`;
 }
 
 function goReview() {
-  const st=getStats(), rem=st.total-st.checked;
-  if(rem>0 && !confirm(`${rem} item(s) not yet marked. Submit anyway?`)) return;
-  nextStep();
+const st=getStats(), rem=st.total-st.checked;
+if(rem>0 && !confirm(`${rem} item(s) not yet marked. Submit anyway?`)) return;
+nextStep();
 }
 
 // ── Step 4: Review ────────────────────────────────
 function step4() {
-  const u=getUnit(), st=getStats(), defs=getDefs(), hasDefs=defs.length>0;
-  const configured = EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY';
-  return `
-    <div class="page-title">Review & Submit</div>
-    <div class="page-subtitle">Confirm before sending to TruckChecks@quapawfire.com</div>
-    ${!configured?`<div class="config-warn">⚠ EmailJS not configured yet. Check will save to history but email will not send until you add your keys.</div>`:''}
-    <div class="section-card" style="margin-bottom:14px;"><div style="padding:18px 20px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px;">
-        <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Unit</span><strong>${u.name}</strong></div>
-        <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Type</span>${TYPE_LABEL[u.type]}</div>
-        <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Date / Time</span>${S.info.date} at ${S.info.time}</div>
-        <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Performed By</span><strong>${S.info.performer}</strong></div>
-        ${S.info.mileage?`<div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Odo / Hours</span>${S.info.mileage}</div>`:''}
-        ${S.info.notes?`<div style="grid-column:1/-1;"><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Notes</span>${S.info.notes}</div>`:''}
-      </div>
-    </div></div>
-    <div class="summary-stats">
-      <div class="stat-card"><div class="stat-value">${st.total}</div><div class="stat-label">Total</div></div>
-      <div class="stat-card pass"><div class="stat-value">${st.passed}</div><div class="stat-label">Pass</div></div>
-      <div class="stat-card fail"><div class="stat-value">${st.failed}</div><div class="stat-label">Fail</div></div>
-      <div class="stat-card na"><div class="stat-value">${st.na}</div><div class="stat-label">N/A</div></div>
-    </div>
-    <div class="status-banner ${hasDefs?'has-deficiencies':'all-clear'}">
-      ${hasDefs?`⚠ ${defs.length} deficiency(ies) found — flagged in report.`:`✓ All checked items passed — ${u.name} is good to go.`}
-    </div>
-    ${hasDefs?`
-      <div style="margin-bottom:20px;">
-        <div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:8px;">Deficiencies</div>
-        ${defs.map(d=>`
-          <div class="deficiency-entry">
-            <div class="deficiency-section">${d.section}</div>
-            <div class="deficiency-item-name">${d.item}</div>
-            ${d.note?`<div class="deficiency-item-note">${d.note}</div>`:''}
-            ${d.photos?.length?`<div style="margin-top:6px;display:flex;gap:4px;">${d.photos.map(p=>`<img src="${p}" style="width:42px;height:42px;object-fit:cover;border-radius:3px;border:1px solid var(--border);">`).join('')}</div>`:''}
-          </div>`).join('')}
-      </div>` : ''}
-    <div class="nav-buttons">
-      <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
-      <button class="btn btn-success" onclick="submitCheck()">✓ Submit Report</button>
-    </div>`;
+const u=getUnit(), st=getStats(), {failed:defs, corrected:corrs}=getDefs();
+const hasDefs=defs.length>0, hasCorrs=corrs.length>0;
+const configured = EMAILJS_PUBLIC_KEY !== ‘YOUR_PUBLIC_KEY’;
+return ` <div class="page-title">Review & Submit</div> <div class="page-subtitle">Confirm before sending to TruckChecks@quapawfire.com</div> ${!configured?`<div class="config-warn">⚠ EmailJS not configured yet. Check will save to history but email will not send until you add your keys.</div>`:''} <div class="section-card" style="margin-bottom:14px;"><div style="padding:18px 20px;"> <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px;"> <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Unit</span><strong>${u.name}</strong></div> <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Type</span>${TYPE_LABEL[u.type]}</div> <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Date / Time</span>${S.info.date} at ${S.info.time}</div> <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Performed By</span><strong>${S.info.performer}</strong></div> ${S.info.mileage?`<div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Odo / Hours</span>${S.info.mileage}</div>`:''} ${S.info.notes?`<div style="grid-column:1/-1;"><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px;">Notes</span>${S.info.notes}</div>`:''} </div> </div></div> <div class="summary-stats"> <div class="stat-card"><div class="stat-value">${st.total}</div><div class="stat-label">Total</div></div> <div class="stat-card pass"><div class="stat-value">${st.passed}</div><div class="stat-label">Pass</div></div> <div class="stat-card fail"><div class="stat-value">${st.failed}</div><div class="stat-label">Fail</div></div> <div class="stat-card corr"><div class="stat-value">${st.corrected}</div><div class="stat-label">Corr</div></div> <div class="stat-card na"><div class="stat-value">${st.na}</div><div class="stat-label">N/A</div></div> </div> <div class="status-banner ${hasDefs?'has-deficiencies':'all-clear'}"> ${hasDefs ? `⚠ ${defs.length} outstanding deficiency(ies) — require follow-up.`: hasCorrs ?`✓ No outstanding deficiencies — ${corrs.length} item(s) corrected during this check.`:`✓ All checked items passed — ${u.name} is good to go.`} </div> ${hasDefs?`
+<div style="margin-bottom:20px;">
+<div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#f87171;margin-bottom:8px;">Outstanding Deficiencies</div>
+${defs.map(d=>` <div class="deficiency-entry"> <div class="deficiency-section">${d.section}</div> <div class="deficiency-item-name">${d.item}</div> ${d.note?`<div class="deficiency-item-note">${d.note}</div>`:''} ${d.photos?.length?`<div style="margin-top:6px;display:flex;gap:4px;">${d.photos.map(p=>`<img src="${p}" style="width:42px;height:42px;object-fit:cover;border-radius:3px;border:1px solid var(--border);">`).join(’’)}</div>`:''} </div>`).join(’’)}
+</div>` : ''} ${hasCorrs?`
+<div style="margin-bottom:20px;">
+<div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--amber);margin-bottom:8px;">Corrected During This Check</div>
+${corrs.map(d=>` <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--radius);padding:11px 15px;margin-bottom:8px;"> <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--amber);margin-bottom:2px;">${d.section}</div> <div style="font-size:14px;color:var(--text);">${d.item}</div> ${d.note?`<div style="font-size:12px;color:var(--text-muted);margin-top:3px;font-style:italic;">${d.note}</div>`:''} </div>`).join(’’)}
+</div>` : ''} <div class="nav-buttons"> <button class="btn btn-secondary" onclick="prevStep()">← Back</button> <button class="btn btn-success" onclick="submitCheck()">✓ Submit Report</button> </div>`;
 }
 
 function getDefs() {
-  const cl=getCL(), defs=[];
-  cl.forEach((sec,si)=>sec.items.forEach((item,ii)=>{
-    const key=`${si}-${ii}`;
-    if(S.items[key]?.status==='fail') defs.push({section:sec.title,item,note:S.items[key].note||'',photos:S.items[key].photos||[]});
-  }));
-  return defs;
+const cl=getCL(), failed=[], corrected=[];
+cl.forEach((sec,si)=>sec.items.forEach((item,ii)=>{
+const key=`${si}-${ii}`, it=S.items[key];
+if(it?.status===‘fail’)      failed.push({section:sec.title,item,note:it.note||’’,photos:it.photos||[]});
+if(it?.status===‘corrected’) corrected.push({section:sec.title,item,note:it.note||’’,photos:it.photos||[]});
+}));
+return {failed, corrected};
 }
 
 // ════════════════════════════════════════════════════
 // NAV
 // ════════════════════════════════════════════════════
 function nextStep() { if(S.step<4){S.step++;renderStep();} }
-function prevStep() { if(S.step>1){S.step--;renderStep();} }
+function prevStep() { if(S.step>1){S.step–;renderStep();} }
 
 // ════════════════════════════════════════════════════
 // SUBMIT
 // ════════════════════════════════════════════════════
 async function submitCheck() {
-  const u=getUnit(), st=getStats(), defs=getDefs(), cl=getCL();
+const u=getUnit(), st=getStats(), {failed:defs, corrected:corrs}=getDefs(), cl=getCL();
 
-  // Build plain-text report for email
-  const line = s => s+'\n';
-  const ruler = c => c.repeat(52)+'\n';
-  let r='';
-  r+=line('QUAPAW FIRE DEPARTMENT');
-  r+=line('APPARATUS CHECK REPORT');
-  r+=ruler('═');
-  r+=line(`Unit:         ${u.name}`);
-  r+=line(`Type:         ${TYPE_LABEL[u.type]}`);
-  r+=line(`Date / Time:  ${S.info.date} at ${S.info.time}`);
-  r+=line(`Performed By: ${S.info.performer}`);
-  if(S.info.mileage) r+=line(`Odo / Hours:  ${S.info.mileage}`);
-  if(S.info.notes)   r+=line(`Notes:        ${S.info.notes}`);
-  r+='\n';
-  r+=line(`RESULTS: ${st.passed} PASS  |  ${st.failed} FAIL  |  ${st.na} N/A  |  ${st.total-st.checked} UNCHECKED`);
-  r+=defs.length>0 ? line(`STATUS:  ⚠ ${defs.length} DEFICIENCY(IES) — FOLLOW-UP REQUIRED`) : line('STATUS:  ✓ ALL CLEAR');
-  if(defs.length>0) {
-    r+='\n'+ruler('─');
-    r+=line('DEFICIENCIES');
-    r+=ruler('─');
-    defs.forEach((d,i)=>{
-      r+=line(`\n${i+1}. [${d.section}]`);
-      r+=line(`   ${d.item}`);
-      if(d.note) r+=line(`   Note: ${d.note}`);
-      if(d.photos?.length) r+=line(`   Photos: ${d.photos.length} attached`);
-    });
-  }
-  r+='\n'+ruler('─');
-  r+=line('FULL CHECKLIST');
-  r+=ruler('─');
-  cl.forEach((sec,si)=>{
-    r+='\n'+line(sec.title.toUpperCase());
-    sec.items.forEach((item,ii)=>{
-      const key=`${si}-${ii}`, s=(S.items[key]?.status||'unchecked').toUpperCase().padEnd(9);
-      r+=line(`  [${s}] ${item}`);
-      if(S.items[key]?.note) r+=line(`             → ${S.items[key].note}`);
-    });
-  });
-  r+='\n'+ruler('═');
-  r+=line('Generated by QFD Apparatus Check System — quapawfire.com');
+const line = s => s+’\n’;
+const ruler = c => c.repeat(52)+’\n’;
+let r=’’;
+r+=line(‘QUAPAW FIRE DEPARTMENT’);
+r+=line(‘APPARATUS CHECK REPORT’);
+r+=ruler(‘═’);
+r+=line(`Unit:         ${u.name}`);
+r+=line(`Type:         ${TYPE_LABEL[u.type]}`);
+r+=line(`Date / Time:  ${S.info.date} at ${S.info.time}`);
+r+=line(`Performed By: ${S.info.performer}`);
+if(S.info.mileage) r+=line(`Odo / Hours:  ${S.info.mileage}`);
+if(S.info.notes)   r+=line(`Notes:        ${S.info.notes}`);
+r+=’\n’;
+r+=line(`RESULTS: ${st.passed} PASS  |  ${st.failed} FAIL  |  ${st.corrected} CORR  |  ${st.na} N/A`);
+r+=defs.length>0 ? line(`STATUS:  ⚠ ${defs.length} OUTSTANDING DEFICIENCY(IES) — FOLLOW-UP REQUIRED`) : line(‘STATUS:  ✓ ALL CLEAR’);
+if(defs.length>0) {
+r+=’\n’+ruler(‘─’);
+r+=line(‘OUTSTANDING DEFICIENCIES’);
+r+=ruler(‘─’);
+defs.forEach((d,i)=>{
+r+=line(`\n${i+1}. [${d.section}]`);
+r+=line(`   ${d.item}`);
+if(d.note) r+=line(`   Note: ${d.note}`);
+if(d.photos?.length) r+=line(`   Photos: ${d.photos.length} attached`);
+});
+}
+if(corrs.length>0) {
+r+=’\n’+ruler(‘─’);
+r+=line(‘CORRECTED DURING THIS CHECK’);
+r+=ruler(‘─’);
+corrs.forEach((d,i)=>{
+r+=line(`\n${i+1}. [${d.section}]`);
+r+=line(`   ${d.item}`);
+if(d.note) r+=line(`   Correction: ${d.note}`);
+});
+}
+r+=’\n’+ruler(‘─’);
+r+=line(‘FULL CHECKLIST’);
+r+=ruler(‘─’);
+cl.forEach((sec,si)=>{
+r+=’\n’+line(sec.title.toUpperCase());
+sec.items.forEach((item,ii)=>{
+const key=`${si}-${ii}`, s=(S.items[key]?.status||‘unchecked’).toUpperCase().padEnd(9);
+r+=line(`  [${s}] ${item}`);
+if(S.items[key]?.note) r+=line(`             → ${S.items[key].note}`);
+});
+});
+r+=’\n’+ruler(‘═’);
+r+=line(‘Generated by QFD Apparatus Check System — quapawfire.com’);
 
-  // Save to Supabase (shared) + localStorage (offline fallback)
-  const payload={
-    id:Date.now().toString(), timestamp:new Date().toISOString(),
-    unit_id:S.unitId, unit_name:u.name, unit_type:u.type,
-    date:S.info.date, time:S.info.time, performer:S.info.performer,
-    mileage:S.info.mileage, notes:S.info.notes, stats:st, deficiencies:defs,
-    checklist:cl.map((sec,si)=>({title:sec.title,items:sec.items.map((item,ii)=>{
-      const key=`${si}-${ii}`;
-      return {item,status:S.items[key]?.status||'unchecked',note:S.items[key]?.note||'',photos:S.items[key]?.photos||[]};
-    })}))
-  };
-  await saveToHistory(payload);
+const payload={
+id:Date.now().toString(), timestamp:new Date().toISOString(),
+unit_id:S.unitId, unit_name:u.name, unit_type:u.type,
+date:S.info.date, time:S.info.time, performer:S.info.performer,
+mileage:S.info.mileage, notes:S.info.notes, stats:st,
+deficiencies:[…defs, …corrs.map(c=>({…c, corrected:true}))],
+checklist:cl.map((sec,si)=>({title:sec.title,items:sec.items.map((item,ii)=>{
+const key=`${si}-${ii}`;
+return {item,status:S.items[key]?.status||‘unchecked’,note:S.items[key]?.note||’’,photos:S.items[key]?.photos||[]};
+})}))
+};
+await saveToHistory(payload);
 
-  if(EMAILJS_PUBLIC_KEY==='YOUR_PUBLIC_KEY') {
-    toast('Saved to history. Add EmailJS keys to enable email.','error');
-    setTimeout(resetApp,2200); return;
-  }
+if(EMAILJS_PUBLIC_KEY===‘YOUR_PUBLIC_KEY’) {
+toast(‘Saved to history. Add EmailJS keys to enable email.’,‘error’);
+setTimeout(resetApp,2200); return;
+}
 
-  document.getElementById('loadingOverlay').classList.add('visible');
-  const subj=`[QFD Check] ${u.name} — ${S.info.date} — ${defs.length>0?'⚠ '+defs.length+' DEFICIENCY':'✓ ALL CLEAR'}`;
-  try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {subject:subj, to_email:'TruckChecks@quapawfire.com', report:r});
-    document.getElementById('loadingOverlay').classList.remove('visible');
-    toast('✓ Report sent to TruckChecks@quapawfire.com','success');
-    setTimeout(resetApp,2000);
-  } catch(err) {
-    document.getElementById('loadingOverlay').classList.remove('visible');
-    toast('Email failed: '+(err?.text||err?.message||'Unknown error')+' — Check saved to history.','error');
-    setTimeout(resetApp,3000);
-  }
+document.getElementById(‘loadingOverlay’).classList.add(‘visible’);
+const subj=`[QFD Check] ${u.name} — ${S.info.date} — ${defs.length>0?'⚠ '+defs.length+' DEFICIENCY':corrs.length>0?'✓ CLEAR / '+corrs.length+' CORRECTED':'✓ ALL CLEAR'}`;
+try {
+await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {subject:subj, to_email:‘TruckChecks@quapawfire.com’, report:r});
+document.getElementById(‘loadingOverlay’).classList.remove(‘visible’);
+toast(‘✓ Report sent to TruckChecks@quapawfire.com’,‘success’);
+setTimeout(resetApp,2000);
+} catch(err) {
+document.getElementById(‘loadingOverlay’).classList.remove(‘visible’);
+toast(‘Email failed: ‘+(err?.text||err?.message||‘Unknown error’)+’ — Check saved to history.’,‘error’);
+setTimeout(resetApp,3000);
+}
 }
 
 function resetApp() {
-  S={step:1,unitId:null,info:{date:'',time:'',performer:'',mileage:'',notes:''},items:{}};
-  renderStep();
+S={step:1,unitId:null,info:{date:’’,time:’’,performer:’’,mileage:’’,notes:’’},items:{}};
+renderStep();
 }
 
 // ════════════════════════════════════════════════════
@@ -714,133 +698,111 @@ function resetApp() {
 let _historyCache = []; // used by viewDetail
 
 async function saveToHistory(p) {
-  // Always save to localStorage as offline backup
-  try {
-    const local = JSON.parse(localStorage.getItem('qfd_history')||'[]');
-    local.unshift(p); localStorage.setItem('qfd_history', JSON.stringify(local.slice(0,50)));
-  } catch(e) {}
-  // Save to Supabase for shared visibility
-  const { error } = await db.from('apparatus_checks').insert([{
-    id:           p.id,
-    unit_id:      p.unit_id,
-    unit_name:    p.unit_name,
-    unit_type:    p.unit_type,
-    date:         p.date,
-    time:         p.time,
-    performer:    p.performer,
-    mileage:      p.mileage || '',
-    notes:        p.notes   || '',
-    stats:        p.stats,
-    deficiencies: p.deficiencies,
-    checklist:    p.checklist
-  }]);
-  if (error) console.warn('Supabase save error:', error.message);
+// Always save to localStorage as offline backup
+try {
+const local = JSON.parse(localStorage.getItem(‘qfd_history’)||’[]’);
+local.unshift(p); localStorage.setItem(‘qfd_history’, JSON.stringify(local.slice(0,50)));
+} catch(e) {}
+// Save to Supabase for shared visibility
+const { error } = await db.from(‘apparatus_checks’).insert([{
+id:           p.id,
+unit_id:      p.unit_id,
+unit_name:    p.unit_name,
+unit_type:    p.unit_type,
+date:         p.date,
+time:         p.time,
+performer:    p.performer,
+mileage:      p.mileage || ‘’,
+notes:        p.notes   || ‘’,
+stats:        p.stats,
+deficiencies: p.deficiencies,
+checklist:    p.checklist
+}]);
+if (error) console.warn(‘Supabase save error:’, error.message);
 }
 
 async function renderHistory() {
-  const c = document.getElementById('historyContent');
-  c.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted);">
-    <div class="spinner" style="margin:0 auto 14px;"></div>Loading shared history...
+const c = document.getElementById(‘historyContent’);
+c.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted);">
+<div class="spinner" style="margin:0 auto 14px;"></div>Loading shared history…
+
   </div>`;
 
-  const { data, error } = await db
-    .from('apparatus_checks')
-    .select('id,unit_name,unit_type,date,time,performer,mileage,stats,deficiencies,notes')
-    .order('date', { ascending: false })
-    .order('time', { ascending: false })
-    .limit(200);
+const { data, error } = await db
+.from(‘apparatus_checks’)
+.select(‘id,unit_name,unit_type,date,time,performer,mileage,stats,deficiencies,notes’)
+.order(‘date’, { ascending: false })
+.order(‘time’, { ascending: false })
+.limit(200);
 
-  if (error) {
-    // Fall back to localStorage if Supabase unreachable
-    const local = JSON.parse(localStorage.getItem('qfd_history')||'[]');
-    _historyCache = local;
-    renderHistoryTable(local, true);
-    return;
-  }
+if (error) {
+// Fall back to localStorage if Supabase unreachable
+const local = JSON.parse(localStorage.getItem(‘qfd_history’)||’[]’);
+_historyCache = local;
+renderHistoryTable(local, true);
+return;
+}
 
-  _historyCache = data || [];
-  renderHistoryTable(_historyCache, false);
+_historyCache = data || [];
+renderHistoryTable(_historyCache, false);
 }
 
 function renderHistoryTable(h, isOffline) {
-  const c = document.getElementById('historyContent');
-  if (!h.length) {
-    c.innerHTML = `<div class="empty-state"><div style="font-size:48px;margin-bottom:14px;">📋</div>
-      <div style="font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;text-transform:uppercase;margin-bottom:6px;">No Check History</div>
-      <p style="font-size:14px;">Completed checks appear here.</p></div>`;
-    return;
-  }
-  const offlineBanner = isOffline
-    ? `<div style="background:rgba(245,158,11,.1);border:1px solid var(--amber);border-radius:var(--radius);padding:9px 14px;font-size:13px;color:var(--amber);margin-bottom:12px;">⚠ Showing device-local history — could not reach shared database.</div>`
-    : '';
-  c.innerHTML = offlineBanner + `
-    <div class="section-card">
-      <table class="history-table">
-        <thead><tr><th>Date</th><th>Unit</th><th>Performed By</th><th>Result</th><th></th></tr></thead>
-        <tbody>${h.map(x => `
-          <tr>
-            <td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${x.date}<br><span style="color:var(--text-muted)">${x.time}</span></td>
-            <td><strong>${x.unit_name||x.unitName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${TYPE_LABEL[x.unit_type||x.type]||''}</span></td>
-            <td>${x.performer}</td>
-            <td>${x.stats?.failed>0
-              ? `<span class="badge badge-fail">⚠ ${x.stats.failed} FAIL</span>`
-              : `<span class="badge badge-pass">✓ CLEAR</span>`}</td>
-            <td><button class="link-btn" onclick="viewDetail('${x.id}')">View</button></td>
-          </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`;
+const c = document.getElementById(‘historyContent’);
+if (!h.length) {
+c.innerHTML = `<div class="empty-state"><div style="font-size:48px;margin-bottom:14px;">📋</div> <div style="font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;text-transform:uppercase;margin-bottom:6px;">No Check History</div> <p style="font-size:14px;">Completed checks appear here.</p></div>`;
+return;
+}
+const offlineBanner = isOffline
+? `<div style="background:rgba(245,158,11,.1);border:1px solid var(--amber);border-radius:var(--radius);padding:9px 14px;font-size:13px;color:var(--amber);margin-bottom:12px;">⚠ Showing device-local history — could not reach shared database.</div>`
+: ‘’;
+c.innerHTML = offlineBanner + `<div class="section-card"> <table class="history-table"> <thead><tr><th>Date</th><th>Unit</th><th>Performed By</th><th>Result</th><th></th></tr></thead> <tbody>${h.map(x =>`
+<tr>
+<td style="font-family:'JetBrains Mono',monospace;font-size:12px;">${x.date}<br><span style="color:var(--text-muted)">${x.time}</span></td>
+<td><strong>${x.unit_name||x.unitName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${TYPE_LABEL[x.unit_type||x.type]||’’}</span></td>
+<td>${x.performer}</td>
+<td>${x.stats?.failed>0
+? `<span class="badge badge-fail">⚠ ${x.stats.failed} FAIL</span>`
+: x.stats?.corrected>0
+? `<span class="badge" style="background:rgba(245,158,11,.2);color:var(--amber);">✓ ${x.stats.corrected} CORR</span>`
+: `<span class="badge badge-pass">✓ CLEAR</span>`}</td>
+<td><button class="link-btn" onclick="viewDetail('${x.id}')">View</button></td>
+</tr>`).join('')} </tbody> </table> </div>`;
 }
 
 async function viewDetail(id) {
-  // Try cache first, then fetch full record from Supabase if needed
-  let h = _historyCache.find(x => x.id === id);
-  if (!h || !h.checklist) {
-    const { data } = await db.from('apparatus_checks').select('*').eq('id', id).single();
-    if (data) h = data;
-  }
-  if (!h) return;
+// Try cache first, then fetch full record from Supabase if needed
+let h = _historyCache.find(x => x.id === id);
+if (!h || !h.checklist) {
+const { data } = await db.from(‘apparatus_checks’).select(’*’).eq(‘id’, id).single();
+if (data) h = data;
+}
+if (!h) return;
 
-  const defs = h.deficiencies || [];
-  const unitName = h.unit_name || h.unitName || '';
-  document.getElementById('modalTitle').textContent = `${unitName} — ${h.date}`;
-  document.getElementById('modalBody').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;font-size:14px;">
-      <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Unit</span><strong>${unitName}</strong></div>
-      <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Performed By</span>${h.performer}</div>
-      <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Date / Time</span>${h.date} at ${h.time}</div>
-      ${h.mileage?`<div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Odo / Hours</span>${h.mileage}</div>`:''}
-      ${h.notes?`<div style="grid-column:1/-1;"><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Notes</span>${h.notes}</div>`:''}
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;">
-      ${['total','passed','failed','na'].map(k=>`
-        <div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px;text-align:center;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:${k==='passed'?'#4ade80':k==='failed'?'#f87171':'var(--text)'};">${h.stats?.[k]||0}</div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">${k}</div>
-        </div>`).join('')}
-    </div>
-    ${defs.length>0 ? `
-      <div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:8px;">Deficiencies</div>
-      ${defs.map(d=>`
-        <div class="deficiency-entry">
-          <div class="deficiency-section">${d.section}</div>
-          <div class="deficiency-item-name">${d.item}</div>
-          ${d.note?`<div class="deficiency-item-note">${d.note}</div>`:''}
-          ${d.photos?.length?`<div style="margin-top:6px;display:flex;gap:4px;">${d.photos.map(p=>`<img src="${p}" style="width:48px;height:48px;object-fit:cover;border-radius:3px;border:1px solid var(--border);">`).join('')}</div>`:''}
-        </div>`).join('')}`
-    : `<div style="text-align:center;color:var(--text-muted);padding:16px;font-size:14px;">✓ No deficiencies on this check.</div>`}`;
-  document.getElementById('historyModal').classList.add('visible');
+const defs = h.deficiencies || [];
+const unitName = h.unit_name || h.unitName || ‘’;
+document.getElementById(‘modalTitle’).textContent = `${unitName} — ${h.date}`;
+document.getElementById(‘modalBody’).innerHTML = ` <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;font-size:14px;"> <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Unit</span><strong>${unitName}</strong></div> <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Performed By</span>${h.performer}</div> <div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Date / Time</span>${h.date} at ${h.time}</div> ${h.mileage?`<div><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Odo / Hours</span>${h.mileage}</div>`:''} ${h.notes?`<div style="grid-column:1/-1;"><span style="color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;display:block;">Notes</span>${h.notes}</div>`:''} </div> <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px;"> ${['total','passed','failed','corrected','na'].map(k=>`
+<div style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px;text-align:center;">
+<div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600;color:${k==='passed'?'#4ade80':k==='failed'?'#f87171':k==='corrected'?'var(--amber)':'var(--text)'};">${h.stats?.[k]||0}</div>
+<div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">${k===‘corrected’?‘corr’:k}</div>
+</div>`).join('')} </div> ${defs.filter(d=>!d.corrected).length>0 ? `
+<div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#f87171;margin-bottom:8px;">Outstanding Deficiencies</div>
+${defs.filter(d=>!d.corrected).map(d=>` <div class="deficiency-entry"> <div class="deficiency-section">${d.section}</div> <div class="deficiency-item-name">${d.item}</div> ${d.note?`<div class="deficiency-item-note">${d.note}</div>`:''} ${d.photos?.length?`<div style="margin-top:6px;display:flex;gap:4px;">${d.photos.map(p=>`<img src="${p}" style="width:48px;height:48px;object-fit:cover;border-radius:3px;border:1px solid var(--border);">`).join(’’)}</div>`:''} </div>`).join(’’)}`: ''} ${defs.filter(d=>d.corrected).length>0 ?`
+<div style="font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--amber);margin-top:12px;margin-bottom:8px;">Corrected During This Check</div>
+${defs.filter(d=>d.corrected).map(d=>` <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--radius);padding:11px 15px;margin-bottom:8px;"> <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--amber);margin-bottom:2px;">${d.section}</div> <div style="font-size:14px;color:var(--text);">${d.item}</div> ${d.note?`<div style="font-size:12px;color:var(--text-muted);margin-top:3px;font-style:italic;">${d.note}</div>`:''} </div>`).join(’’)}`: ''} ${defs.length===0 ?`<div style="text-align:center;color:var(--text-muted);padding:16px;font-size:14px;">✓ No deficiencies on this check.</div>` : ''}`;
+document.getElementById(‘historyModal’).classList.add(‘visible’);
 }
 
-function closeModal() { document.getElementById('historyModal').classList.remove('visible'); }
+function closeModal() { document.getElementById(‘historyModal’).classList.remove(‘visible’); }
 
 // ════════════════════════════════════════════════════
 // TOAST
 // ════════════════════════════════════════════════════
-function toast(msg, type='success') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className=`toast ${type} visible`;
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('visible'),5000);
+function toast(msg, type=‘success’) {
+const t=document.getElementById(‘toast’);
+t.textContent=msg; t.className=`toast ${type} visible`;
+clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove(‘visible’),5000);
 }
 
 // ════════════════════════════════════════════════════
@@ -848,5 +810,6 @@ function toast(msg, type='success') {
 // ════════════════════════════════════════════════════
 renderStep();
 </script>
+
 </body>
 </html>
