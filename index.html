@@ -243,7 +243,7 @@ const UNITS = [
   {id:'eng21',    name:'Engine 21',     type:'engine',    icon:'🚒'},
   {id:'eng22',    name:'Engine 22',     type:'engine',    icon:'🚒'},
   {id:'res23',    name:'Rescue 23',     type:'rescue',    icon:'🔧'},
-  {id:'medres',   name:'Medium Rescue', type:'medrescue', icon:'💨'},
+  {id:'medres',   name:'Rescue 11',     type:'medrescue', icon:'💨'},
   {id:'tank2',    name:'Tanker 2',      type:'tanker',    icon:'🚛'},
   {id:'tank25',   name:'Tanker 25',     type:'tanker',    icon:'🚛'},
 ];
@@ -634,7 +634,7 @@ async function submitCheck() {
   const line = s => s+'\n';
   const ruler = c => c.repeat(52)+'\n';
   let r='';
-  r+=line('QUAPAW VOLUNTEER FIRE DEPARTMENT');
+  r+=line('QUAPAW FIRE DEPARTMENT');
   r+=line('APPARATUS CHECK REPORT');
   r+=ruler('═');
   r+=line(`Unit:         ${u.name}`);
