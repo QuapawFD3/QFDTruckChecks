@@ -613,7 +613,7 @@ function step4() {
   const configured = EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY';
   return `
     <div class="page-title">Review & Submit</div>
-    <div class="page-subtitle">Confirm before sending to TruckChecks@quapawfire.com</div>
+    <div class="page-subtitle">Confirm before sending to Quapawfiredepartment@gmail.com</div>
     ${!configured?`<div class="config-warn">⚠ EmailJS not configured yet. Check will save to history but email will not send until you add your keys.</div>`:''}
     <div class="section-card" style="margin-bottom:14px;"><div style="padding:18px 20px;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px;">
@@ -759,9 +759,9 @@ async function submitCheck() {
   document.getElementById('loadingOverlay').classList.add('visible');
   const subj=`[QFD Check] ${u.name} — ${S.info.date} — ${defs.length>0?'⚠ '+defs.length+' DEFICIENCY':corrs.length>0?'✓ CLEAR / '+corrs.length+' CORRECTED':'✓ ALL CLEAR'}`;
   try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {subject:subj, to_email:'TruckChecks@quapawfire.com', report:r});
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {subject:subj, to_email:'Quapawfiredepartment@gmail.com', report:r});
     document.getElementById('loadingOverlay').classList.remove('visible');
-    toast('✓ Report sent to TruckChecks@quapawfire.com','success');
+    toast('✓ Report sent to Quapawfiredepartment@gmail.com','success');
     setTimeout(resetApp,2000);
   } catch(err) {
     document.getElementById('loadingOverlay').classList.remove('visible');
