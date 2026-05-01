@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QFD | Department Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface2:#1f2937;--border:#30363d;
+  --red:#dc2626;--red-glow:rgba(220,38,38,0.12);
+  --amber:#f59e0b;--green:#16a34a;--blue:#2563eb;
+  --text:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
+  --radius:6px;--shadow:0 4px 24px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;font-size:15px;line-height:1.5;}
+.app-header{background:var(--surface);border-bottom:3px solid var(--red);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.6);}
+.logo{display:flex;align-items:center;gap:12px;cursor:pointer;}
+.logo-badge{width:40px;height:40px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;flex-shrink:0;}
+.logo-dept{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;letter-spacing:.5px;line-height:1.1;}
+.logo-sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
+.header-clock{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text-muted);letter-spacing:1px;}
+.view{display:none;}.view.active{display:block;}
+.portal-hero{background:linear-gradient(180deg,rgba(220,38,38,0.08) 0%,transparent 100%);border-bottom:1px solid var(--border);padding:40px 24px 32px;text-align:center;}
+.portal-title{font-family:'Oswald',sans-serif;font-size:32px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.portal-subtitle{font-size:14px;color:var(--text-muted);letter-spacing:1px;}
+.portal-stats-bar{display:flex;align-items:center;justify-content:center;gap:32px;margin-top:20px;flex-wrap:wrap;}
+.pstat{text-align:center;}.pstat-val{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;color:var(--red);line-height:1;}
+.pstat-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-top:3px;}
+.pstat-divider{width:1px;height:36px;background:var(--border);}
+.portal-main{max-width:960px;margin:0 auto;padding:32px 24px;}
+.portal-section-label{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.portal-section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:36px;}
+.module-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;text-decoration:none;display:block;}
+.module-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--module-color,var(--red));transform:scaleX(0);transform-origin:left;transition:transform .2s;}
+.module-card:hover{border-color:var(--module-color,var(--red));background:var(--surface2);transform:translateY(-2px);}
+.module-card:hover::before{transform:scaleX(1);}
+.module-icon{font-size:26px;margin-bottom:10px;display:block;}
+.module-name{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text);margin-bottom:3px;}
+.module-desc{font-size:12px;color:var(--text-muted);line-height:1.4;}
+.module-badge{position:absolute;top:10px;right:10px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:.5px;}
+.badge-live{background:rgba(22,163,74,.2);color:#4ade80;border:1px solid rgba(22,163,74,.3);}
+.badge-soon{background:rgba(139,148,158,.1);color:var(--text-dim);border:1px solid var(--border);}
+.inner-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:48px;gap:8px;}
+.back-btn{background:none;border:none;color:var(--text-muted);font-family:'Barlow',sans-serif;font-size:13px;font-weight:500;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;}
+.back-btn:hover{color:var(--text);}
+.inner-divider{color:var(--text-dim);font-size:12px;}
+.inner-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.module-content{max-width:960px;margin:0 auto;padding:28px 24px;}
+.page-title{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--text-muted);margin-bottom:22px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;}
+.card-header{padding:13px 20px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.card-title{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.card-action{font-size:12px;color:var(--red);cursor:pointer;background:none;border:none;font-family:'Barlow',sans-serif;font-weight:500;padding:0;}
+.card-action:hover{color:#f87171;}
+
+/* YEAR SELECTOR */
+.year-selector{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;}
+.year-btn{padding:8px 18px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:1px;}
+.year-btn:hover{border-color:var(--text-muted);color:var(--text);}
+.year-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
+.year-summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;}
+.yscard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
+.yscard-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;line-height:1;margin-bottom:3px;}
+.yscard-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);}
+
+/* TABS */
+.tab-nav{display:flex;gap:2px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px;flex-wrap:wrap;}
+.tab-btn{padding:7px 16px;border:none;background:none;color:var(--text-muted);font-family:'Barlow',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border-radius:4px;transition:all .2s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{background:var(--red);color:#fff;}
+
+/* LEADERBOARD */
+.leaderboard{width:100%;border-collapse:collapse;}
+.leaderboard th{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:10px 16px;text-align:left;border-bottom:2px solid var(--border);background:var(--surface2);}
+.leaderboard td{padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.leaderboard tr:last-child td{border-bottom:none;}
+.leaderboard tr:hover td{background:var(--surface2);}
+.rank-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);}
+.rank-1 .rank-num{color:#ffd700;font-weight:700;}
+.rank-2 .rank-num{color:#c0c0c0;font-weight:700;}
+.rank-3 .rank-num{color:#cd7f32;font-weight:700;}
+.run-bar-wrap{width:120px;background:var(--surface2);border-radius:2px;height:6px;overflow:hidden;}
+.run-bar{height:100%;background:var(--red);border-radius:2px;}
+
+/* MULTI-YEAR TREND */
+.trend-chart{padding:20px;}
+.trend-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.trend-year{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--text);width:36px;flex-shrink:0;}
+.trend-bar-wrap{flex:1;background:var(--surface2);border-radius:3px;height:22px;overflow:hidden;position:relative;}
+.trend-bar-inner{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#fff;transition:width .6s ease;}
+.trend-total{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);width:36px;text-align:right;flex-shrink:0;}
+
+/* MONTHLY CHART */
+.month-chart{padding:20px;}
+.month-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.month-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);width:28px;flex-shrink:0;}
+.month-bar-wrap{flex:1;background:var(--surface2);border-radius:2px;height:18px;overflow:hidden;}
+.month-bar-inner{height:100%;background:var(--red);border-radius:2px;display:flex;align-items:center;padding-left:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff;font-weight:600;min-width:4px;}
+.month-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);width:24px;text-align:right;flex-shrink:0;}
+
+/* MEMBER CARDS */
+.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.mscard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;}
+.mscard-name{font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.mscard-total{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;color:var(--red);line-height:1;}
+.mscard-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.mscard-months{display:flex;gap:2px;margin-top:8px;}
+.mscard-mo{flex:1;background:var(--surface2);border-radius:2px;height:4px;}
+.mscard-mo.has{background:var(--red);}
+
+/* MISSED TABLE */
+.missed-table{width:100%;border-collapse:collapse;}
+.missed-table th{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:10px 16px;text-align:left;border-bottom:2px solid var(--border);background:var(--surface2);}
+.missed-table td{padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px;}
+.missed-table tr:last-child td{border-bottom:none;}
+
+/* RUN LOG */
+.run-filters{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:20px;background:var(--surface);color:var(--text-muted);font-family:'Barlow',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;}
+.filter-btn:hover{border-color:var(--text-muted);color:var(--text);}
+.filter-btn.active{background:var(--red-glow);border-color:var(--red);color:var(--text);}
+.filter-search{margin-left:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;padding:6px 12px;width:200px;transition:border-color .15s;}
+.filter-search:focus{outline:none;border-color:var(--red);}
+.run-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.run-table{width:100%;border-collapse:collapse;}
+.run-table th{font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:10px 16px;text-align:left;border-bottom:2px solid var(--border);background:var(--surface2);}
+.run-table td{padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.run-table tr:last-child td{border-bottom:none;}
+.run-table tr:hover td{background:var(--surface2);}
+.run-type-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.5px;white-space:nowrap;}
+.badge-medical{background:rgba(37,99,235,.2);color:#60a5fa;border:1px solid rgba(37,99,235,.3);}
+.badge-fire{background:rgba(220,38,38,.2);color:#f87171;border:1px solid rgba(220,38,38,.3);}
+.load-more-btn{width:100%;padding:12px;background:var(--surface2);border:none;border-top:1px solid var(--border);color:var(--text-muted);font-family:'Barlow',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:color .2s;}
+.load-more-btn:hover{color:var(--text);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:center;justify-content:center;padding:24px;display:none;}
+.modal-overlay.visible{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:640px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow);}
+.modal-header{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);}
+.modal-title{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;}
+.modal-body{padding:20px 22px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.detail-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:2px;}
+.detail-value{font-size:14px;}
+.detail-full{grid-column:1/-1;}
+.member-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.member-chip{padding:3px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--text-muted);}
+.tag-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.tag-chip{padding:2px 8px;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);border-radius:4px;font-size:11px;color:#f87171;}
+
+/* ROSTER */
+.roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+.roster-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.roster-avatar{width:38px;height:38px;background:var(--surface2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;color:var(--text-muted);flex-shrink:0;border:1px solid var(--border);}
+.roster-name{font-weight:600;font-size:14px;line-height:1.2;}
+.roster-phone{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+/* COMING SOON */
+.coming-soon{text-align:center;padding:80px 32px;max-width:480px;margin:0 auto;}
+.cs-icon{font-size:56px;margin-bottom:16px;display:block;}
+.cs-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.cs-sub{font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:24px;}
+.cs-features{text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;}
+.cs-feature{font-size:13px;color:var(--text-muted);padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.cs-feature:last-child{border-bottom:none;}
+.cs-feature::before{content:'○';color:var(--text-dim);font-size:10px;}
+
+/* UTILS */
+.spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-state{text-align:center;padding:48px;color:var(--text-muted);}
+.empty-state{text-align:center;padding:48px;color:var(--text-muted);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;font-size:14px;font-weight:500;z-index:1000;box-shadow:var(--shadow);display:none;max-width:320px;}
+.toast.success{border-color:var(--green);color:#4ade80;}
+.toast.error{border-color:var(--red);color:#f87171;}
+.toast.visible{display:block;animation:toastIn .3s ease;}
+@keyframes toastIn{from{transform:translateY(10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+@media(max-width:640px){
+  .app-header{padding:0 14px;}.portal-main,.module-content{padding:20px 14px;}
+  .module-grid{grid-template-columns:1fr 1fr;}.year-summary-cards{grid-template-columns:1fr 1fr;}
+  .portal-stats-bar{gap:16px;}.pstat-divider{display:none;}
+  .detail-grid{grid-template-columns:1fr;}.filter-search{width:100%;margin-left:0;}
+  .run-table th:nth-child(4),.run-table td:nth-child(4){display:none;}
+  .logo-sub,.header-clock{display:none;}.roster-grid,.member-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="modal-overlay" id="runModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Run Report</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<header class="app-header">
+  <div class="logo" onclick="goHome()">
+    <div class="logo-badge">QFD</div>
+    <div>
+      <div class="logo-dept">Quapaw Fire Dept.</div>
+      <div class="logo-sub">Department Portal</div>
+    </div>
+  </div>
+  <div class="header-clock" id="headerClock"></div>
+</header>
+
+<!-- ══ HOME ══════════════════════════════════════════ -->
+<div class="view active" id="view-home">
+  <div class="portal-hero">
+    <div class="portal-title">QFD Operations Portal</div>
+    <div class="portal-subtitle">Quapaw Volunteer Fire Department · Quapaw, Oklahoma</div>
+    <div class="portal-stats-bar">
+      <div class="pstat"><div class="pstat-val">1,666</div><div class="pstat-lbl">Total Runs 2022–26</div></div>
+      <div class="pstat-divider"></div>
+      <div class="pstat"><div class="pstat-val">129</div><div class="pstat-lbl">2026 YTD</div></div>
+      <div class="pstat-divider"></div>
+      <div class="pstat"><div class="pstat-val">26</div><div class="pstat-lbl">Active Members</div></div>
+      <div class="pstat-divider"></div>
+      <div class="pstat"><div class="pstat-val">5</div><div class="pstat-lbl">Years of Records</div></div>
+    </div>
+  </div>
+  <div class="portal-main">
+    <div class="portal-section-label">Operational Tools</div>
+    <div class="module-grid">
+      <div class="module-card" style="--module-color:#dc2626" onclick="openModule('run-log')">
+        <span class="module-badge badge-live">LIVE</span>
+        <span class="module-icon">📟</span>
+        <div class="module-name">Run Log</div>
+        <div class="module-desc">Full incident history from JotForm</div>
+      </div>
+      <div class="module-card" style="--module-color:#f59e0b" onclick="openModule('run-stats')">
+        <span class="module-badge badge-live">2022–26</span>
+        <span class="module-icon">📊</span>
+        <div class="module-name">Run Statistics</div>
+        <div class="module-desc">5-year history, member leaderboards, trends</div>
+      </div>
+      <a class="module-card" href="https://checklist.quapawfire.com" style="--module-color:#dc2626">
+        <span class="module-badge badge-live">LIVE</span>
+        <span class="module-icon">🚒</span>
+        <div class="module-name">Truck Checks</div>
+        <div class="module-desc">NFPA 1911 apparatus inspections</div>
+      </a>
+      <div class="module-card" style="--module-color:#f59e0b" onclick="cs('Hose Checks','🚿','NFPA 1962 hose inventory, service testing, and certification records.',['Inventory by type and length','Annual service test log (300 PSI / 3 min)','Coupling and jacket condition tracking','Out-of-service flagging','Exportable test reports'])">
+        <span class="module-badge badge-soon">SOON</span>
+        <span class="module-icon">🚿</span>
+        <div class="module-name">Hose Checks</div>
+        <div class="module-desc">Inventory, service testing, NFPA 1962</div>
+      </div>
+      <div class="module-card" style="--module-color:#2563eb" onclick="cs('SCBA Checks','😮‍💨','Dedicated SCBA unit tracking for all packs, cylinders, and face pieces.',['Per-pack inspection log','Cylinder hydro-test date tracking','Flow test scheduling and records','Face piece fit-test records','PASS device functional checks'])">
+        <span class="module-badge badge-soon">SOON</span>
+        <span class="module-icon">😮‍💨</span>
+        <div class="module-name">SCBA Checks</div>
+        <div class="module-desc">Pack, cylinder, and mask records</div>
+      </div>
+    </div>
+    <div class="portal-section-label">Records & Admin</div>
+    <div class="module-grid">
+      <div class="module-card" style="--module-color:#16a34a" onclick="openModule('roster')">
+        <span class="module-badge badge-live">LIVE</span>
+        <span class="module-icon">👥</span>
+        <div class="module-name">Member Roster</div>
+        <div class="module-desc">Contact directory, 26 active members</div>
+      </div>
+      <div class="module-card" style="--module-color:#f59e0b" onclick="cs('Training Log','📚','Track individual and department-wide training hours, certifications, and compliance.',['Per-member training hour tracking','Certification and expiration records','OSDH compliance','Quarterly report export','Instructor-led session logs'])">
+        <span class="module-badge badge-soon">SOON</span>
+        <span class="module-icon">📚</span>
+        <div class="module-name">Training Log</div>
+        <div class="module-desc">Hours, certs, compliance tracking</div>
+      </div>
+      <div class="module-card" style="--module-color:#f59e0b" onclick="cs('Equipment Maintenance','🔧','Service and maintenance log for department equipment — generators, tools, SCBA compressor.',['Per-equipment service history','Scheduled maintenance reminders','Out-of-service status flags','Repair cost tracking','Warranty and purchase records'])">
+        <span class="module-badge badge-soon">SOON</span>
+        <span class="module-icon">🔧</span>
+        <div class="module-name">Equipment Maintenance</div>
+        <div class="module-desc">Service logs for tools and equipment</div>
+      </div>
+      <div class="module-card" style="--module-color:#f59e0b" onclick="cs('Hydrant Map','💧','Track hydrant flow test results, maintenance status, and GPS locations.',['GPS-mapped hydrant locations','Flow test history (GPM / PSI)','Out-of-service flags','Annual ISO compliance reporting','Linked to district subscription data'])">
+        <span class="module-badge badge-soon">SOON</span>
+        <span class="module-icon">💧</span>
+        <div class="module-name">Hydrant Map</div>
+        <div class="module-desc">Flow tests, maintenance, district map</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RUN LOG ════════════════════════════════════════ -->
+<div class="view" id="view-run-log">
+  <div class="inner-header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <span class="inner-divider">/</span>
+    <span class="inner-title">Run Log</span>
+  </div>
+  <div class="module-content">
+    <div class="page-title">Incident & Run Log</div>
+    <div class="page-sub" id="runLogSub">2026 incidents from JotForm</div>
+    <div class="run-filters">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All Runs</button>
+      <button class="filter-btn" onclick="setFilter('fire',this)">🔥 Fire / Vehicle</button>
+      <button class="filter-btn" onclick="setFilter('medical',this)">🚑 Medical</button>
+      <input class="filter-search" type="text" placeholder="Search address, type..." id="runSearch" oninput="applyFilters()">
+    </div>
+    <div id="runLogContent"><div class="loading-state"><div class="spinner"></div>Loading runs...</div></div>
+  </div>
+</div>
+
+<!-- ══ RUN STATS ══════════════════════════════════════ -->
+<div class="view" id="view-run-stats">
+  <div class="inner-header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <span class="inner-divider">/</span>
+    <span class="inner-title">Run Statistics</span>
+  </div>
+  <div class="module-content">
+    <div class="page-title">Run Statistics</div>
+    <div class="page-sub">5-year historical record · 2022 – 2026</div>
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tab-trend" onclick="setStatsTab('trend',this)">All-Time Trend</button>
+      <button class="tab-btn" id="tab-leaderboard" onclick="setStatsTab('leaderboard',this)">Leaderboard</button>
+      <button class="tab-btn" id="tab-monthly" onclick="setStatsTab('monthly',this)">Monthly</button>
+      <button class="tab-btn" id="tab-members" onclick="setStatsTab('members',this)">By Member</button>
+      <button class="tab-btn" id="tab-missed" onclick="setStatsTab('missed',this)">Missed Calls</button>
+    </div>
+    <div id="stats-trend"></div>
+    <div id="stats-leaderboard" style="display:none;"></div>
+    <div id="stats-monthly" style="display:none;"></div>
+    <div id="stats-members" style="display:none;"></div>
+    <div id="stats-missed" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ══ ROSTER ════════════════════════════════════════ -->
+<div class="view" id="view-roster">
+  <div class="inner-header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <span class="inner-divider">/</span>
+    <span class="inner-title">Member Roster</span>
+  </div>
+  <div class="module-content">
+    <div class="page-title">Active Roster</div>
+    <div class="page-sub">Quapaw Volunteer Fire Department — 26 active members</div>
+    <div class="roster-grid" id="rosterGrid"></div>
+  </div>
+</div>
+
+<!-- ══ COMING SOON ════════════════════════════════════ -->
+<div class="view" id="view-coming-soon">
+  <div class="inner-header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <span class="inner-divider">/</span>
+    <span class="inner-title" id="csInnerTitle">Coming Soon</span>
+  </div>
+  <div class="module-content">
+    <div class="coming-soon">
+      <span class="cs-icon" id="csIcon">🚧</span>
+      <div class="cs-title" id="csTitle">Under Construction</div>
+      <div class="cs-sub" id="csSub"></div>
+      <div class="cs-features" id="csFeatures"></div>
+      <div style="font-size:12px;color:var(--text-dim);">Contact Jason Garrison to prioritize this module.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// JOTFORM CONFIG
+// ═══════════════════════════════════════════════
+const JOTFORM_API_KEY = '792134ddfe36e6c11deafdf03af52071';
+const FORM_FIRE = '221616934825157';
+const FORM_MED  = '221566768228062';
+
+// ═══════════════════════════════════════════════
+// HISTORICAL DATA — 2022–2026
+// ═══════════════════════════════════════════════
+const HIST = {
+  2022: {
+    total: 471, missed: 0, missedNote: 'Not tracked',
+    monthly: [31,34,41,42,29,34,50,37,50,64,37,22],
+    members: [
+      {name:'Jason Garrison',  total:301, months:[12,20,11,29,17,14,34,25,43,42,33,21]},
+      {name:'Matt Lovell',     total:247, months:[23,23,27,27,22,24,22,11,21,28,12,7]},
+      {name:'Ike Douffet',     total:202, months:[19,18,22,33,15,17,15,14,13,28,7,1]},
+      {name:'Jarrod McKibben', total:189, months:[1,1,3,7,10,17,26,19,29,43,21,12]},
+      {name:'Will Langley',    total:112, months:[8,8,9,10,7,6,15,8,13,17,8,3]},
+      {name:'Albert Ray',      total:136, months:[3,7,15,8,3,10,25,10,18,25,7,5]},
+      {name:'Casey Abernathy', total:79,  months:[8,8,6,9,5,5,11,6,7,6,7,1]},
+      {name:'Stan Humble',     total:53,  months:[5,6,5,2,4,3,11,2,4,4,3,4]},
+      {name:'Nick Abernathy',  total:48,  months:[5,5,3,2,3,3,10,2,6,4,5,0]},
+      {name:'Drew Dixon',      total:21,  months:[1,2,1,1,0,3,4,0,4,5,0,0]},
+      {name:'Sammy Humble',    total:22,  months:[0,4,1,2,0,1,5,0,3,1,2,3]},
+      {name:'Cory Humble',     total:20,  months:[3,2,0,2,1,0,6,5,1,0,0,0]},
+      {name:'Travis Compton',  total:22,  months:[2,2,2,2,2,2,3,1,3,1,1,1]},
+      {name:'Anthony Moreno',  total:18,  months:[0,0,0,0,0,0,0,0,0,0,11,7]},
+      {name:'Matt Abernathy',  total:31,  months:[1,3,3,2,5,1,6,2,4,3,1,0]},
+      {name:'John Mate',       total:34,  months:[1,1,3,2,1,4,5,2,7,6,2,0]},
+      {name:'Josh Rutledge',   total:16,  months:[2,2,3,2,0,0,3,1,2,1,0,0]},
+      {name:'Doug',            total:26,  months:[5,8,10,3,0,0,0,0,0,0,0,0]},
+      {name:'Devin Cook',      total:7,   months:[0,0,0,0,0,0,0,0,0,0,4,3]},
+      {name:'Trevor Brown',    total:6,   months:[0,0,0,0,0,0,0,0,0,0,4,2]},
+      {name:'Dale Lasiter',    total:8,   months:[0,1,0,0,0,2,1,0,0,3,1,0]},
+      {name:'Dean Post',       total:1,   months:[0,0,0,0,0,1,0,0,0,0,0,0]},
+      {name:'Travis Eby',      total:4,   months:[1,1,1,0,0,0,1,0,0,0,0,0]},
+      {name:'Josh Brinkley',   total:7,   months:[1,1,0,0,0,0,0,0,1,3,0,1]},
+    ]
+  },
+  2023: {
+    total: 431, missed: 93,
+    monthly: [63,32,41,41,34,33,28,27,22,28,44,38],
+    members: [
+      {name:'Jason Garrison',  total:338, months:[55,30,37,37,23,25,16,19,14,24,29,29]},
+      {name:'Matt Lovell',     total:156, months:[23,10,11,14,16,11,13,8,16,7,17,10]},
+      {name:'Trevor Brown',    total:136, months:[17,6,9,8,4,14,8,12,9,16,16,17]},
+      {name:'Albert Ray',      total:134, months:[34,8,8,16,7,5,11,6,10,12,11,6]},
+      {name:'Will Langley',    total:119, months:[24,5,5,11,6,9,13,12,11,8,6,9]},
+      {name:'Jarrod McKibben', total:100, months:[39,10,9,5,9,1,6,6,8,0,6,1]},
+      {name:'Casey Abernathy', total:63,  months:[13,1,4,9,6,4,7,8,2,2,5,2]},
+      {name:'Anthony Moreno',  total:53,  months:[7,11,7,14,10,3,1,0,0,0,0,0]},
+      {name:'Zayne Suman',     total:48,  months:[0,0,0,0,0,0,0,9,12,9,13,5]},
+      {name:'Devin Cook',      total:45,  months:[8,4,4,4,2,5,6,1,1,5,3,2]},
+      {name:'Matt Abernathy',  total:39,  months:[10,0,3,2,5,1,2,5,3,2,4,2]},
+      {name:'John Mate',       total:37,  months:[10,0,3,5,0,2,2,2,3,0,7,3]},
+      {name:'Justin Wray',     total:33,  months:[0,0,0,0,0,3,1,3,7,11,4,4]},
+      {name:'Cory Humble',     total:31,  months:[11,0,1,1,2,1,4,1,2,2,3,3]},
+      {name:'Stan Humble',     total:30,  months:[18,4,2,2,1,0,0,0,1,0,0,2]},
+      {name:'Kiante Edwards',  total:29,  months:[0,0,0,0,0,0,0,0,0,0,12,17]},
+      {name:'Nick Abernathy',  total:28,  months:[7,0,2,4,1,1,2,4,3,0,3,1]},
+      {name:'Drew Dixon',      total:16,  months:[3,4,2,3,1,0,1,0,1,1,0,0]},
+      {name:'Ike Douffet',     total:15,  months:[6,5,3,1,0,0,0,0,0,0,0,0]},
+      {name:'Sammy Humble',    total:14,  months:[6,1,0,1,1,1,0,0,3,0,0,1]},
+      {name:'Travis Compton',  total:11,  months:[3,1,1,1,1,0,1,1,0,0,1,1]},
+      {name:'Josh Rutledge',   total:6,   months:[5,1,0,0,0,0,0,0,0,0,0,0]},
+    ]
+  },
+  2024: {
+    total: 434, missed: 198,
+    monthly: [30,18,26,24,20,12,31,37,28,28,19,23], // using Jason's row as dept proxy — actual from Totals
+    members: [
+      {name:'Jason Garrison',  total:296, months:[30,18,26,24,20,12,31,37,28,28,19,23]},
+      {name:'Kiante Edwards',  total:162, months:[18,17,20,18,17,3,9,26,8,19,4,3]},
+      {name:'Matt Lovell',     total:139, months:[12,17,14,12,10,9,7,17,16,15,3,7]},
+      {name:'Albert Ray',      total:135, months:[12,18,21,11,7,9,8,5,5,21,9,9]},
+      {name:'Trevor Brown',    total:126, months:[17,6,11,8,8,3,7,18,13,22,6,7]},
+      {name:'Will Langley',    total:92,  months:[7,13,16,4,5,4,8,8,4,15,2,6]},
+      {name:'Kyle Forbis',     total:79,  months:[0,0,8,9,4,6,15,19,8,6,4,0]},
+      {name:'Jarrod McKibben', total:68,  months:[4,15,19,17,6,2,1,1,2,0,1,0]},
+      {name:'Casey Abernathy', total:68,  months:[3,2,11,2,6,2,4,6,4,18,6,4]},
+      {name:'Cory Humble',     total:61,  months:[5,11,5,2,3,6,3,3,6,8,5,4]},
+      {name:'Matt Abernathy',  total:53,  months:[3,8,6,5,3,6,4,5,2,8,1,2]},
+      {name:'Zayne Suman',     total:43,  months:[6,9,3,0,0,3,2,4,2,9,2,3]},
+      {name:'Cody Murphy',     total:35,  months:[0,4,5,1,2,1,3,3,2,9,4,1]},
+      {name:'Clayton Hayes',   total:35,  months:[0,4,5,1,2,1,3,3,2,9,4,1]},
+      {name:'Nick Abernathy',  total:34,  months:[2,4,1,2,0,3,3,5,2,9,2,1]},
+      {name:'Sammy Humble',    total:30,  months:[1,2,2,1,1,5,0,2,0,11,3,2]},
+      {name:'Stan Humble',     total:27,  months:[4,2,8,0,0,1,0,1,2,5,3,1]},
+      {name:'Drew Dixon',      total:21,  months:[1,6,6,1,0,0,3,1,0,3,0,0]},
+      {name:'Devin Cook',      total:20,  months:[1,1,4,1,0,0,2,2,1,7,1,0]},
+      {name:'Justin Wray',     total:17,  months:[1,0,0,0,0,0,3,4,2,7,0,0]},
+      {name:'John Mate',       total:16,  months:[2,0,3,0,0,0,2,2,1,5,1,0]},
+      {name:'Henry Hayes',     total:10,  months:[0,1,1,0,0,0,4,1,1,1,1,0]},
+      {name:'Travis Compton',  total:10,  months:[0,1,0,0,0,0,0,0,2,5,0,2]},
+      {name:'Dominic Humble',  total:8,   months:[0,0,0,0,0,0,3,2,1,1,1,0]},
+    ]
+  },
+  2025: {
+    total: 331, missed: 218,
+    monthly: [34,18,41,25,33,19,24,30,16,22,39,30],
+    members: [
+      {name:'Jason Garrison',  total:209, months:[24,10,25,16,19,16,13,21,8,12,26,19]},
+      {name:'Trevor Brown',    total:83,  months:[8,5,13,4,2,2,2,5,1,10,15,16]},
+      {name:'Derek Boman',     total:74,  months:[0,0,0,0,1,7,10,12,8,12,14,10]},
+      {name:'Derek Pittman',   total:73,  months:[5,7,16,9,16,3,7,5,1,0,1,3]},
+      {name:'Matt Lovell',     total:70,  months:[9,3,7,4,18,6,8,4,2,2,4,3]},
+      {name:'Will Langley',    total:67,  months:[8,6,11,4,6,5,6,6,1,2,5,7]},
+      {name:'Albert Ray',      total:56,  months:[6,7,16,5,6,0,4,2,2,1,0,7]},
+      {name:'Cory Humble',     total:41,  months:[3,3,4,3,3,3,2,5,1,4,6,4]},
+      {name:'Casey Abernathy', total:35,  months:[4,3,5,4,3,4,3,2,0,3,2,2]},
+      {name:'Jarrod McKibben', total:30,  months:[1,0,6,5,5,1,1,0,0,1,4,6]},
+      {name:'Zayne Suman',     total:20,  months:[2,1,0,3,5,3,1,0,0,2,0,3]},
+      {name:'Justin Wray',     total:18,  months:[0,2,5,3,0,1,0,1,0,2,0,4]},
+      {name:'Sammy Humble',    total:15,  months:[2,0,3,2,1,0,0,0,0,0,2,5]},
+      {name:'Stan Humble',     total:12,  months:[1,2,2,1,1,0,0,0,0,0,3,2]},
+      {name:'Devin Cook',      total:10,  months:[1,0,2,1,0,2,0,0,1,1,0,2]},
+      {name:'Cody Murphy',     total:9,   months:[1,0,2,2,0,0,1,0,0,0,1,2]},
+      {name:'Clayton Hayes',   total:9,   months:[1,0,2,2,0,0,1,0,0,0,1,2]},
+      {name:'Nick Abernathy',  total:9,   months:[0,0,3,0,0,2,1,1,0,1,0,1]},
+      {name:'Kiante Edwards',  total:8,   months:[4,0,2,1,1,0,0,0,0,0,0,0]},
+      {name:'Travis Compton',  total:8,   months:[0,1,1,2,1,1,0,0,0,1,0,1]},
+      {name:'John Mate',       total:7,   months:[0,0,3,1,0,1,0,1,0,0,1,0]},
+      {name:'Dominic Humble',  total:7,   months:[1,0,2,1,0,1,0,0,0,0,0,2]},
+      {name:'Job Rendel',      total:6,   months:[0,0,0,1,1,1,0,1,0,0,1,1]},
+      {name:'Matt Abernathy',  total:6,   months:[0,0,0,1,1,1,0,1,0,0,1,1]},
+      {name:'Henry Hayes',     total:2,   months:[0,0,0,0,0,1,1,0,0,0,0,0]},
+      {name:'Kyle Forbis',     total:2,   months:[1,0,0,0,0,0,0,1,0,0,0,0]},
+    ]
+  },
+  2026: {
+    total: 129, missed: 15, missedNote: 'YTD through April',
+    monthly: [41,35,35,18,0,0,0,0,0,0,0,0],
+    members: [
+      {name:'Jason Garrison',  total:93,  months:[29,24,31,9,0,0,0,0,0,0,0,0]},
+      {name:'Jarrod McKibben', total:53,  months:[14,15,23,1,0,0,0,0,0,0,0,0]},
+      {name:'Will Langley',    total:47,  months:[9,15,19,4,0,0,0,0,0,0,0,0]},
+      {name:'Derek Boman',     total:46,  months:[14,14,13,5,0,0,0,0,0,0,0,0]},
+      {name:'John Mate',       total:40,  months:[8,16,13,3,0,0,0,0,0,0,0,0]},
+      {name:'Trevor Brown',    total:39,  months:[15,8,14,2,0,0,0,0,0,0,0,0]},
+      {name:'Casey Abernathy', total:22,  months:[3,7,9,3,0,0,0,0,0,0,0,0]},
+      {name:'Cody Murphy',     total:20,  months:[6,6,7,1,0,0,0,0,0,0,0,0]},
+      {name:'Zayne Suman',     total:19,  months:[5,5,6,3,0,0,0,0,0,0,0,0]},
+      {name:'Cory Humble',     total:18,  months:[3,7,8,0,0,0,0,0,0,0,0,0]},
+      {name:'Matt Lovell',     total:18,  months:[0,9,7,2,0,0,0,0,0,0,0,0]},
+      {name:'Ethan Mate',      total:17,  months:[0,0,12,5,0,0,0,0,0,0,0,0]},
+      {name:'Travis Compton',  total:13,  months:[3,4,6,0,0,0,0,0,0,0,0,0]},
+      {name:'Nick Abernathy',  total:9,   months:[0,2,7,0,0,0,0,0,0,0,0,0]},
+      {name:'Matt Abernathy',  total:8,   months:[0,4,4,0,0,0,0,0,0,0,0,0]},
+      {name:'Justin Wray',     total:8,   months:[0,6,1,1,0,0,0,0,0,0,0,0]},
+      {name:'Albert Ray',      total:8,   months:[2,4,1,1,0,0,0,0,0,0,0,0]},
+      {name:'Stan Humble',     total:11,  months:[2,8,1,0,0,0,0,0,0,0,0,0]},
+      {name:'Sammy Humble',    total:9,   months:[2,6,1,0,0,0,0,0,0,0,0,0]},
+      {name:'Job Rendel',      total:8,   months:[2,3,3,0,0,0,0,0,0,0,0,0]},
+      {name:'Derek Pittman',   total:7,   months:[2,3,1,1,0,0,0,0,0,0,0,0]},
+      {name:'Kyle Forbis',     total:6,   months:[6,0,0,0,0,0,0,0,0,0,0,0]},
+      {name:'Henry Hayes',     total:5,   months:[4,0,1,0,0,0,0,0,0,0,0,0]},
+      {name:'Clayton Hayes',   total:5,   months:[4,1,0,0,0,0,0,0,0,0,0,0]},
+      {name:'Dominic Humble',  total:4,   months:[1,2,1,0,0,0,0,0,0,0,0,0]},
+      {name:'Devin Cook',      total:1,   months:[0,0,0,1,0,0,0,0,0,0,0,0]},
+    ],
+    missed_list: [
+      {date:'2026-01-06',time:'15:21',address:'Hwy 69A & S 600 Rd.',   type:'Signal 82'},
+      {date:'2026-01-07',time:'16:02',address:'407 Whitebird St.',      type:'Difficulty Breathing'},
+      {date:'2026-01-10',time:'03:30',address:'61851 E 94 Rd.',         type:'General Weakness'},
+      {date:'2026-01-13',time:'09:51',address:'203 N Maple',            type:'Seizure'},
+      {date:'2026-01-13',time:'10:47',address:'203 N Maple',            type:'Seizure'},
+      {date:'2026-01-14',time:'08:57',address:'407 Whitebird St.',      type:'Possible Stroke'},
+      {date:'2026-01-16',time:'13:12',address:'310 Virginia St.',       type:'Domestic'},
+      {date:'2026-01-17',time:'12:55',address:'7901 S 620 Rd.',         type:'Stomach Pain'},
+      {date:'2026-01-20',time:'13:45',address:'324 Seneca St.',         type:'Chest Pain'},
+      {date:'2026-01-24',time:'08:11',address:'204 E 10th St.',         type:'Difficulty Breathing'},
+      {date:'2026-01-27',time:'10:21',address:'407 Whitebird St.',      type:'General Weakness'},
+      {date:'2026-01-29',time:'08:26',address:'326 Main St.',           type:'Fall / Back Pain'},
+      {date:'2026-01-31',time:'09:17',address:'407 Whitebird St.',      type:'Fire Alarm'},
+      {date:'2026-02-07',time:'01:30',address:'407 Whitebird St.',      type:'Difficulty Breathing'},
+      {date:'2026-02-07',time:'08:48',address:'407 Whitebird St.',      type:'Unresponsive'},
+    ]
+  }
+};
+
+const YEARS = [2022,2023,2024,2025,2026];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let selectedYear = 2026;
+let currentStatsTab = 'trend';
+
+// ═══════════════════════════════════════════════
+// ROSTER
+// ═══════════════════════════════════════════════
+const ROSTER = [
+  {name:'Albert Ray',phone:'918-961-8687'},{name:'Casey Abernathy',phone:'918-541-5869'},
+  {name:'Clayton Hayes',phone:'918-541-6923'},{name:'Cody Murphy',phone:'918-961-8569'},
+  {name:'Cory Humble',phone:'918-541-7826'},{name:'Derek Boman',phone:'918-533-3954'},
+  {name:'Derek Pittman',phone:'918-325-0882'},{name:'Devin Cook',phone:'918-533-3230'},
+  {name:'Dominic Humble',phone:'918-320-9901'},{name:'Ethan Mate',phone:'417-291-4491'},
+  {name:'Henry Hayes',phone:'918-533-0995'},{name:'Jarrod McKibben',phone:'918-541-6297'},
+  {name:'Jason Garrison',phone:'918-320-0889'},{name:'Job Rendel',phone:'918-541-8304'},
+  {name:'John Mate',phone:'417-291-7269'},{name:'Justin Wray',phone:'918-533-1385'},
+  {name:'Kyle Forbis',phone:'918-541-4102'},{name:'Matt Abernathy',phone:'918-541-5090'},
+  {name:'Matt Lovell',phone:'918-961-3379'},{name:'Nick Abernathy',phone:'918-961-1101'},
+  {name:'Sammy Humble',phone:'918-541-3828'},{name:'Stan Humble',phone:'918-541-0592'},
+  {name:'Travis Compton',phone:'918-541-0756'},{name:'Trevor Brown',phone:'620-429-5119'},
+  {name:'Will Langley',phone:'918-961-3220'},{name:'Zayne Suman',phone:'918-961-8821'},
+];
+
+// ═══════════════════════════════════════════════
+// CLOCK & ROUTING
+// ═══════════════════════════════════════════════
+function updateClock(){
+  const n=new Date();
+  document.getElementById('headerClock').textContent=n.toLocaleDateString('en-US',{month:'short',day:'numeric'})+'  '+n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+updateClock(); setInterval(updateClock,30000);
+
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-'+id).classList.add('active');window.scrollTo(0,0);}
+function goHome(){showView('home');}
+function cs(t,i,s,f){document.getElementById('csInnerTitle').textContent=t;document.getElementById('csTitle').textContent=t;document.getElementById('csIcon').textContent=i;document.getElementById('csSub').textContent=s;document.getElementById('csFeatures').innerHTML=(f||[]).map(x=>`<div class="cs-feature">${x}</div>`).join('');showView('coming-soon');}
+function openModule(mod){
+  if(mod==='roster'){renderRoster();showView('roster');return;}
+  if(mod==='run-log'){showView('run-log');ensureRunsLoaded();return;}
+  if(mod==='run-stats'){showView('run-stats');renderStatsTab('trend');return;}
+}
+
+// ═══════════════════════════════════════════════
+// RUN STATS
+// ═══════════════════════════════════════════════
+function setStatsTab(tab,btn){
+  currentStatsTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['trend','leaderboard','monthly','members','missed'].forEach(t=>{
+    document.getElementById('stats-'+t).style.display=t===tab?'':'none';
+  });
+  renderStatsTab(tab);
+}
+function renderStatsTab(tab){
+  if(tab==='trend') renderTrend();
+  if(tab==='leaderboard') renderLeaderboard();
+  if(tab==='monthly') renderMonthly();
+  if(tab==='members') renderMembers();
+  if(tab==='missed') renderMissed();
+}
+
+// ── All-Time Trend ───────────────────────────────
+function renderTrend(){
+  const el=document.getElementById('stats-trend');
+  const maxTotal=Math.max(...YEARS.map(y=>HIST[y].total));
+  // All-time top 5 by summing across years
+  const allMember={};
+  YEARS.forEach(y=>{
+    HIST[y].members.forEach(m=>{
+      if(!allMember[m.name]) allMember[m.name]=0;
+      allMember[m.name]+=m.total;
+    });
+  });
+  const top5=Object.entries(allMember).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const maxAll=top5[0][1];
+
+  const yearColors={2022:'#dc2626',2023:'#f59e0b',2024:'#2563eb',2025:'#16a34a',2026:'#8b5cf6'};
+
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Annual Run Volume</div></div>
+        <div class="trend-chart">
+          ${YEARS.map(y=>`
+            <div class="trend-row">
+              <div class="trend-year">${y}</div>
+              <div class="trend-bar-wrap">
+                <div class="trend-bar-inner" style="width:${Math.round(HIST[y].total/maxTotal*100)}%;background:${yearColors[y]};">
+                  ${HIST[y].total>=40?HIST[y].total:''}
+                </div>
+              </div>
+              <div class="trend-total">${HIST[y].total}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Missed / No Response</div></div>
+        <div class="trend-chart">
+          ${YEARS.map(y=>{
+            const m=HIST[y].missed;
+            const maxM=218;
+            return `
+            <div class="trend-row">
+              <div class="trend-year">${y}</div>
+              <div class="trend-bar-wrap">
+                <div class="trend-bar-inner" style="width:${m?Math.round(m/maxM*100):4}%;background:${m?'var(--amber)':'var(--text-dim)'};">
+                  ${m>=20?m:''}
+                </div>
+              </div>
+              <div class="trend-total" style="color:${m?'var(--amber)':'var(--text-dim)'};">${m||'—'}</div>
+            </div>`;}).join('')}
+        </div>
+        <div style="padding:0 20px 16px;font-size:11px;color:var(--text-dim);">* 2022 not tracked · 2026 YTD Apr</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">All-Time Top Responders (2022–2026)</div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">Combined 5-year totals</span>
+      </div>
+      <table class="leaderboard">
+        <thead><tr><th>#</th><th>Member</th><th>5-Yr Total</th><th></th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>2026</th></tr></thead>
+        <tbody>
+          ${top5.map(([name,tot],i)=>{
+            const byYear=YEARS.map(y=>{
+              const m=HIST[y].members.find(x=>x.name===name);
+              return m?m.total:0;
+            });
+            return `
+              <tr class="rank-${i+1}">
+                <td class="rank-num">${i+1}</td>
+                <td style="font-weight:600;font-size:14px;">${name}</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--red);">${tot}</td>
+                <td><div class="run-bar-wrap"><div class="run-bar" style="width:${Math.round(tot/maxAll*100)}%"></div></div></td>
+                ${byYear.map((v,yi)=>`<td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:${v>0?yearColors[YEARS[yi]]:'var(--text-dim)'};">${v||'—'}</td>`).join('')}
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── Per-Year Leaderboard ─────────────────────────
+function renderLeaderboard(){
+  const el=document.getElementById('stats-leaderboard');
+  const sorted=[...HIST[selectedYear].members].sort((a,b)=>b.total-a.total);
+  const max=sorted[0]?.total||1;
+  el.innerHTML=`
+    <div class="year-selector">${YEARS.map(y=>`<button class="year-btn ${y===selectedYear?'active':''}" onclick="selectYear(${y},'leaderboard')">${y}</button>`).join('')}</div>
+    <div class="year-summary-cards" style="grid-template-columns:repeat(3,1fr);">
+      <div class="yscard"><div class="yscard-val" style="color:var(--red);">${HIST[selectedYear].total}</div><div class="yscard-lbl">Total Runs</div></div>
+      <div class="yscard"><div class="yscard-val" style="color:${HIST[selectedYear].missed?'var(--amber)':'var(--text-muted)'};">${HIST[selectedYear].missedNote||HIST[selectedYear].missed||'—'}</div><div class="yscard-lbl">Missed Calls</div></div>
+      <div class="yscard"><div class="yscard-val">${sorted[0]?.total||'—'}</div><div class="yscard-lbl">Top Run Count</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">${selectedYear} — Member Leaderboard</div></div>
+      <table class="leaderboard">
+        <thead><tr><th>#</th><th>Member</th><th>Runs</th><th>Volume</th><th>% of Calls</th></tr></thead>
+        <tbody>
+          ${sorted.map((m,i)=>`
+            <tr class="rank-${i+1}">
+              <td class="rank-num">${i+1}</td>
+              <td style="font-weight:600;font-size:14px;">${m.name}</td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;">${m.total}</td>
+              <td><div class="run-bar-wrap"><div class="run-bar" style="width:${Math.round(m.total/max*100)}%"></div></div></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">${(m.total/HIST[selectedYear].total*100).toFixed(1)}%</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ── Monthly Chart ─────────────────────────────────
+function renderMonthly(){
+  const el=document.getElementById('stats-monthly');
+  const mo=HIST[selectedYear].monthly;
+  const max=Math.max(...mo,1);
+  el.innerHTML=`
+    <div class="year-selector">${YEARS.map(y=>`<button class="year-btn ${y===selectedYear?'active':''}" onclick="selectYear(${y},'monthly')">${y}</button>`).join('')}</div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">${selectedYear} — Monthly Run Volume</div><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">Total: ${HIST[selectedYear].total}</span></div>
+      <div class="month-chart">
+        ${MONTHS.map((m,i)=>`
+          <div class="month-row">
+            <div class="month-lbl">${m}</div>
+            <div class="month-bar-wrap">
+              <div class="month-bar-inner" style="width:${mo[i]?Math.max(4,Math.round(mo[i]/max*100))+'%':'0%'}">
+                ${mo[i]>=8?mo[i]:''}
+              </div>
+            </div>
+            <div class="month-val">${mo[i]||(selectedYear===2026&&i>=4?'—':mo[i])}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── By Member Cards ───────────────────────────────
+function renderMembers(){
+  const el=document.getElementById('stats-members');
+  const sorted=[...HIST[selectedYear].members].sort((a,b)=>b.total-a.total);
+  el.innerHTML=`
+    <div class="year-selector">${YEARS.map(y=>`<button class="year-btn ${y===selectedYear?'active':''}" onclick="selectYear(${y},'members')">${y}</button>`).join('')}</div>
+    <div class="member-grid">${sorted.map(m=>{
+      const maxMo=Math.max(...m.months,1);
+      return `<div class="mscard">
+        <div class="mscard-name">${m.name}</div>
+        <div class="mscard-total">${m.total}</div>
+        <div class="mscard-sub">${(m.total/HIST[selectedYear].total*100).toFixed(1)}% of ${selectedYear} calls</div>
+        <div class="mscard-months">${m.months.map((v,i)=>`<div class="mscard-mo ${v>0?'has':''}" style="${v>0?`opacity:${0.3+v/maxMo*0.7}`:'opacity:0.15'}" title="${MONTHS[i]}: ${v}"></div>`).join('')}</div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+// ── Missed Calls ──────────────────────────────────
+function renderMissed(){
+  const el=document.getElementById('stats-missed');
+  const y=HIST[selectedYear];
+  const hasList=y.missed_list&&y.missed_list.length>0;
+  el.innerHTML=`
+    <div class="year-selector">${YEARS.map(yr=>`<button class="year-btn ${yr===selectedYear?'active':''}" onclick="selectYear(${yr},'missed')">${yr}</button>`).join('')}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+      <div class="yscard"><div class="yscard-val" style="color:var(--amber);">${y.missedNote||y.missed||'—'}</div><div class="yscard-lbl">Missed ${selectedYear}${y.missedNote?' ('+y.missedNote+')':''}</div></div>
+      <div class="yscard"><div class="yscard-val">${y.total}</div><div class="yscard-lbl">Responded</div></div>
+      <div class="yscard"><div class="yscard-val" style="color:${y.missed?'var(--amber)':'var(--text-muted)'};">${y.missed?(Math.round(y.missed/(y.total+y.missed)*100)+'%'):'—'}</div><div class="yscard-lbl">Miss Rate</div></div>
+    </div>
+    ${hasList?`
+    <div class="card">
+      <div class="card-header"><div class="card-title">${selectedYear} Missed Calls${y.missedNote?' · '+y.missedNote:''}</div><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--amber);">${y.missed_list.length} shown</span></div>
+      <table class="missed-table">
+        <thead><tr><th>Date</th><th>Time</th><th>Address</th><th>Call Type</th></tr></thead>
+        <tbody>${y.missed_list.map(m=>`
+          <tr>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:11px;">${fmtDate(m.date)}</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);">${m.time}</td>
+            <td>${m.address}</td>
+            <td style="color:var(--amber);font-size:12px;">${m.type}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`:`
+    <div class="card" style="padding:32px;text-align:center;color:var(--text-muted);">
+      <div style="font-size:36px;margin-bottom:12px;">📋</div>
+      <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">${y.missedNote||`${y.missed||0} missed calls recorded`}</div>
+      <div style="font-size:12px;">Detailed missed call log available for 2026.</div>
+    </div>`}`;
+}
+
+function selectYear(y,tab){
+  selectedYear=y;
+  renderStatsTab(tab);
+}
+
+// ═══════════════════════════════════════════════
+// JOTFORM / RUN LOG
+// ═══════════════════════════════════════════════
+let allRuns=[],filteredRuns=[],displayCount=50,activeFilter='all',runsLoaded=false;
+
+function getAns(a,lbl){for(const q of Object.values(a)){if((q.text||'').toLowerCase().includes(lbl.toLowerCase())){if(Array.isArray(q.answer))return q.answer.join(', ');if(q.answer&&typeof q.answer==='object')return Object.values(q.answer).filter(Boolean).join(' ');return q.answer||'';}}return '';}
+function getArr(a,lbl){for(const q of Object.values(a)){if((q.text||'').toLowerCase().includes(lbl.toLowerCase())){if(Array.isArray(q.answer))return q.answer;if(q.answer&&typeof q.answer==='object')return Object.values(q.answer).filter(Boolean);if(q.answer)return[q.answer];}}return[];}
+function parseFire(s){const a=s.answers||{};return{id:s.id,type:'fire',date:getAns(a,'date'),timeCall:getAns(a,'time of call'),timeArrival:getAns(a,'time of arrival'),timeClear:getAns(a,'time clear'),address:getAns(a,'address'),callType:getAns(a,'type of call'),summary:getAns(a,'summary'),reportBy:getAns(a,'report by'),membersResponding:getArr(a,'members responding'),atStation:getArr(a,'at station'),trucksUsed:getArr(a,'trucks used'),equipmentGeneral:getArr(a,'general equipment'),equipmentRescue:getArr(a,'rescue equipment'),scbaPacks:getAns(a,'scba packs'),scbaBottles:getAns(a,'scba bottles'),propertyLoss:getAns(a,'property loss'),acres:getAns(a,'acres'),nerisEntered:getAns(a,'neris'),created:s.created_at};}
+function parseMed(s){const a=s.answers||{};return{id:s.id,type:'medical',date:getAns(a,'date'),timeCall:getAns(a,'time of call'),timeArrival:getAns(a,'time of arrival'),timeClear:getAns(a,'time clear'),address:getAns(a,'address'),callType:'Medical',chiefComplaint:getAns(a,'chief complaint'),patientAge:getAns(a,'age'),patientGender:getAns(a,'gender'),pmh:getAns(a,'past medical'),summary:getAns(a,'summary'),reportBy:getAns(a,'report by'),emsService:getAns(a,'ems service'),membersResponding:getArr(a,'members responding'),atStation:getArr(a,'at station'),nerisEntered:getAns(a,'neris'),created:s.created_at};}
+
+async function ensureRunsLoaded(){
+  if(runsLoaded){renderRunLog();return;}
+  if(JOTFORM_API_KEY==='YOUR_JOTFORM_API_KEY'){
+    allRuns=getDemoRuns();runsLoaded=true;renderRunLog();
+    document.getElementById('runLogSub').innerHTML=`<span style="color:var(--amber)">⚠ Demo mode — add JotForm API key to pull live data</span>`;
+    return;
+  }
+  try{
+    document.getElementById('runLogContent').innerHTML=`<div class="loading-state"><div class="spinner"></div>Loading submissions...</div>`;
+    const [fs,ms]=await Promise.all([
+      fetch(`https://api.jotform.com/form/${FORM_FIRE}/submissions?apiKey=${JOTFORM_API_KEY}&limit=1000&offset=0&orderby=created_at,DESC`).then(r=>r.json()).then(d=>d.content||[]),
+      fetch(`https://api.jotform.com/form/${FORM_MED}/submissions?apiKey=${JOTFORM_API_KEY}&limit=1000&offset=0&orderby=created_at,DESC`).then(r=>r.json()).then(d=>d.content||[])
+    ]);
+    allRuns=[...fs.map(parseFire),...ms.map(parseMed)].sort((a,b)=>new Date(b.created||b.date||0)-new Date(a.created||a.date||0));
+    runsLoaded=true;
+    document.getElementById('runLogSub').textContent=`${allRuns.length.toLocaleString()} total incidents`;
+    renderRunLog();
+  }catch(err){
+    document.getElementById('runLogContent').innerHTML=`<div class="empty-state"><div style="font-size:40px;margin-bottom:12px;">⚠️</div><div style="font-family:'Oswald',sans-serif;font-size:16px;text-transform:uppercase;margin-bottom:4px;">Could Not Load</div><div style="font-size:13px;color:var(--text-muted);">${err.message}</div></div>`;
+  }
+}
+function getDemoRuns(){
+  const b=new Date(),d=n=>{const x=new Date(b);x.setDate(x.getDate()-n);return x.toISOString().split('T')[0];};
+  return[
+    {id:'d1',type:'fire',date:d(2),timeCall:'14:32',timeArrival:'14:41',address:'1847 E 100 Rd, Quapaw OK',callType:'Structure Fire',reportBy:'Jason Garrison',membersResponding:['Jason Garrison','Casey Abernathy'],trucksUsed:['Engine 21','Engine 22'],created:d(2)},
+    {id:'d2',type:'medical',date:d(4),timeCall:'09:14',timeArrival:'09:22',address:'210 Main St, Quapaw OK',callType:'Medical',chiefComplaint:'Chest pain',patientAge:'67',reportBy:'Derek Boman',membersResponding:['Derek Boman','Will Langley'],emsService:'INTEGRIS EMS',created:d(4)},
+    {id:'d3',type:'fire',date:d(8),timeCall:'16:55',timeArrival:'17:04',address:'Hwy 69A MM 14, Quapaw OK',callType:'Vehicle Accident',reportBy:'Clayton Hayes',membersResponding:['Clayton Hayes','Cody Murphy'],trucksUsed:['Rescue 23'],created:d(8)},
+  ];
+}
+function setFilter(f,btn){activeFilter=f;displayCount=50;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');applyFilters();}
+function applyFilters(){
+  const s=(document.getElementById('runSearch')?.value||'').toLowerCase();
+  filteredRuns=allRuns.filter(r=>{
+    if(activeFilter==='fire'&&r.type!=='fire')return false;
+    if(activeFilter==='medical'&&r.type!=='medical')return false;
+    if(s&&!`${r.address} ${r.callType} ${r.summary} ${r.reportBy}`.toLowerCase().includes(s))return false;
+    return true;
+  });
+  renderRunTable();
+}
+function renderRunLog(){filteredRuns=[...allRuns];renderRunTable();}
+function renderRunTable(){
+  const el=document.getElementById('runLogContent');
+  if(!filteredRuns.length){el.innerHTML=`<div class="empty-state"><div style="font-size:40px;margin-bottom:12px;">📋</div><div style="font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;margin-bottom:4px;">No Runs Found</div></div>`;return;}
+  const slice=filteredRuns.slice(0,displayCount);
+  el.innerHTML=`<div class="run-table-wrap"><table class="run-table">
+    <thead><tr><th>Date / Time</th><th>Type</th><th>Address / Call Type</th><th>Crew</th><th>Report By</th><th></th></tr></thead>
+    <tbody>${slice.map(r=>`
+      <tr>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;">${fmtDate(r.date)}<br><span style="color:var(--text-dim)">${r.timeCall||''}</span></td>
+        <td>${r.type==='fire'?`<span class="run-type-badge badge-fire">🔥 FIRE/VEH</span>`:`<span class="run-type-badge badge-medical">🚑 MEDICAL</span>`}</td>
+        <td><div style="font-size:13px;font-weight:500;">${r.address||'—'}</div><div style="font-size:11px;color:var(--text-muted);">${r.callType||''}</div></td>
+        <td style="font-size:12px;color:var(--text-muted);">${(r.membersResponding||[]).length?`${r.membersResponding.length} members`:'—'}</td>
+        <td style="font-size:12px;color:var(--text-muted);">${r.reportBy||'—'}</td>
+        <td><button class="card-action" onclick="viewRun('${r.id}')">View</button></td>
+      </tr>`).join('')}
+    </tbody></table>
+    ${filteredRuns.length>displayCount?`<button class="load-more-btn" onclick="loadMore()">Load More (${filteredRuns.length-displayCount} remaining)</button>`:''}
+  </div>`;
+}
+function loadMore(){displayCount+=50;renderRunTable();}
+function viewRun(id){
+  const r=allRuns.find(x=>x.id===id);if(!r)return;
+  const isFire=r.type==='fire';
+  document.getElementById('modalTitle').textContent=`${isFire?'🔥':'🚑'} ${r.callType||'Incident'} — ${fmtDate(r.date)}`;
+  const sec=(t,c)=>`<div style="margin-bottom:16px;"><div style="font-family:'Oswald',sans-serif;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:8px;">${t}</div>${c}</div>`;
+  const chips=a=>a.length?`<div class="member-chips">${a.map(m=>`<span class="member-chip">${m}</span>`).join('')}</div>`:'<span style="color:var(--text-dim);font-size:12px;">None listed</span>';
+  const tags=a=>a.length?`<div class="tag-chips">${a.map(t=>`<span class="tag-chip">${t}</span>`).join('')}</div>`:'<span style="color:var(--text-dim);font-size:12px;">None</span>';
+  let h=`<div class="detail-grid">
+    <div class="detail-item"><div class="detail-label">Date</div><div class="detail-value">${fmtDate(r.date)}</div></div>
+    <div class="detail-item"><div class="detail-label">Time of Call</div><div class="detail-value">${r.timeCall||'—'}</div></div>
+    <div class="detail-item"><div class="detail-label">Arrival</div><div class="detail-value">${r.timeArrival||'—'}</div></div>
+    <div class="detail-item"><div class="detail-label">Cleared</div><div class="detail-value">${r.timeClear||'—'}</div></div>
+    <div class="detail-item detail-full"><div class="detail-label">Address</div><div class="detail-value">${r.address||'—'}</div></div>
+    <div class="detail-item"><div class="detail-label">Call Type</div><div class="detail-value">${r.callType||'—'}</div></div>
+    <div class="detail-item"><div class="detail-label">Report By</div><div class="detail-value">${r.reportBy||'—'}</div></div>`;
+  if(!isFire)h+=`<div class="detail-item"><div class="detail-label">Age</div><div class="detail-value">${r.patientAge||'—'}</div></div><div class="detail-item"><div class="detail-label">Gender</div><div class="detail-value">${r.patientGender||'—'}</div></div><div class="detail-item detail-full"><div class="detail-label">Chief Complaint</div><div class="detail-value">${r.chiefComplaint||'—'}</div></div><div class="detail-item detail-full"><div class="detail-label">EMS Service</div><div class="detail-value">${r.emsService||'—'}</div></div>`;
+  else{if(r.propertyLoss)h+=`<div class="detail-item"><div class="detail-label">Property Loss</div><div class="detail-value">$${r.propertyLoss}</div></div>`;if(r.acres)h+=`<div class="detail-item"><div class="detail-label">Acres</div><div class="detail-value">${r.acres}</div></div>`;}
+  h+=`</div>`;
+  if(r.summary)h+=sec('Incident Summary',`<div style="font-size:13px;line-height:1.6;">${r.summary}</div>`);
+  h+=sec('Members Responding',chips(r.membersResponding||[]));
+  if(isFire&&(r.trucksUsed||[]).length)h+=sec('Apparatus Used',tags(r.trucksUsed));
+  if((r.atStation||[]).length)h+=sec('At Station',chips(r.atStation));
+  if(isFire&&(r.equipmentGeneral||[]).length)h+=sec('General Equipment',tags(r.equipmentGeneral));
+  if(isFire&&(r.equipmentRescue||[]).length)h+=sec('Rescue Equipment',tags(r.equipmentRescue));
+  h+=`<div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;"><span style="font-size:11px;color:var(--text-dim);">ID: ${r.id}</span><span style="font-size:11px;color:${r.nerisEntered==='Yes'?'#4ade80':'var(--text-dim)'};">${r.nerisEntered==='Yes'?'✓ NERIS':'○ NERIS unknown'}</span></div>`;
+  document.getElementById('modalBody').innerHTML=h;
+  document.getElementById('runModal').classList.add('visible');
+}
+function closeModal(){document.getElementById('runModal').classList.remove('visible');}
+
+// ═══════════════════════════════════════════════
+// ROSTER
+// ═══════════════════════════════════════════════
+function renderRoster(){
+  document.getElementById('rosterGrid').innerHTML=ROSTER.map(m=>{
+    const ini=m.name.split(' ').map(n=>n[0]).join('').slice(0,2);
+    return `<div class="roster-card"><div class="roster-avatar">${ini}</div><div><div class="roster-name">${m.name}</div><div class="roster-phone"><a href="tel:${m.phone}" style="color:var(--text-muted);text-decoration:none;">${m.phone}</a></div></div></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function fmtDate(d){if(!d)return'—';const p=d.split('-');return p.length===3?`${p[1]}/${p[2]}/${p[0]}`:d;}
+function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} visible`;clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('visible'),4000);}
+</script>
+</body>
+</html>
