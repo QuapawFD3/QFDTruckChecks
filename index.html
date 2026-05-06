@@ -44,6 +44,9 @@ body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-
 .logo-badge{width:40px;height:40px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;flex-shrink:0;}
 .logo-dept{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;letter-spacing:.5px;line-height:1.1;}
 .logo-sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
+.performer-locked{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-size:14px;color:var(--text-muted);display:flex;align-items:center;gap:8px;letter-spacing:.2px;}
+.performer-locked .performer-email{color:var(--text);font-weight:500;}
+.performer-locked .lock-icon{font-size:12px;opacity:.6;}
 .nav-tabs{display:flex;gap:4px;}
 .nav-tab{padding:8px 16px;border:none;background:none;color:var(--text-muted);font-family:'Barlow',sans-serif;font-size:14px;font-weight:500;cursor:pointer;border-radius:var(--radius);transition:all .2s;}
 .nav-tab:hover{color:var(--text);background:var(--surface2);}
@@ -397,8 +400,8 @@ function step2() {
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Performed By <span class="required-mark">*</span></label>
-        <input class="form-input" type="text" id="iPerformer" placeholder="Full name" value="${S.info.performer}" oninput="si()">
+        <label class="form-label">Performed By</label>
+        <div class="performer-locked"><span class="lock-icon">🔒</span><span class="performer-email">${S.info.performer||'Not logged in'}</span></div>
       </div>
       <div class="form-group">
         <label class="form-label">Odometer / Engine Hours</label>
@@ -416,13 +419,13 @@ function step2() {
 }
 
 function si() {
-  const m = {date:'iDate',time:'iTime',performer:'iPerformer',mileage:'iMileage',notes:'iNotes'};
+  const m = {date:'iDate',time:'iTime',mileage:'iMileage',notes:'iNotes'};
   Object.entries(m).forEach(([k,id])=>{ const el=document.getElementById(id); if(el) S.info[k]=el.value; });
 }
 
 async function goChecklist() {
   si();
-  if (!S.info.performer.trim()) { toast('Enter the name of the person performing the check.','error'); return; }
+  if (!S.info.performer.trim()) { toast('You must be logged in to perform a check.','error'); return; }
   // Pre-fill all items as PASS
   getCL().forEach((sec, si) => {
     sec.items.forEach((_, ii) => {
@@ -931,7 +934,15 @@ function toast(msg, type='success') {
 // ════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════
-renderStep();
+(async () => {
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    if (session?.user?.email) {
+      S.info.performer = session.user.email;
+    }
+  } catch(e) { /* session unavailable — performer stays blank */ }
+  renderStep();
+})();
 </script>
 </body>
 </html>
