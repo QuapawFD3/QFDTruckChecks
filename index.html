@@ -320,6 +320,7 @@ const CHECKLISTS = {
 // ════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════
+let loggedInEmail = '';
 let S = {step:1, unitId:null, info:{date:'',time:'',performer:'',mileage:'',notes:''}, items:{}};
 const getUnit = () => UNITS.find(u => u.id === S.unitId);
 const getCL   = () => { const u = getUnit(); return u ? CHECKLISTS[u.type] : []; };
@@ -782,7 +783,7 @@ async function submitCheck() {
 }
 
 function resetApp() {
-  S={step:1,unitId:null,info:{date:'',time:'',performer:'',mileage:'',notes:''},items:{}};
+  S={step:1,unitId:null,info:{date:'',time:'',performer:loggedInEmail,mileage:'',notes:''},items:{}};
   renderStep();
 }
 
@@ -934,13 +935,28 @@ function toast(msg, type='success') {
 // ════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════
+function applySession(session) {
+  if (session?.user?.email) {
+    loggedInEmail = session.user.email;
+    S.info.performer = loggedInEmail;
+    const el = document.querySelector('.performer-email');
+    if (el) el.textContent = loggedInEmail;
+  }
+}
+
+// Catch session rehydrated from storage (fixes race condition on page load)
+db.auth.onAuthStateChange((_event, session) => {
+  if (session?.user?.email && !loggedInEmail) {
+    applySession(session);
+    if (S.step === 1) renderStep();
+  }
+});
+
 (async () => {
   try {
     const { data: { session } } = await db.auth.getSession();
-    if (session?.user?.email) {
-      S.info.performer = session.user.email;
-    }
-  } catch(e) { /* session unavailable — performer stays blank */ }
+    applySession(session);
+  } catch(e) { /* session unavailable */ }
   renderStep();
 })();
 </script>
